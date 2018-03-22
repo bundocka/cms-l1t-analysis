@@ -33,7 +33,7 @@ ETA_RANGES = dict(
 )
 
 ALL_THRESHOLDS = dict(
-    HT     = [120, 200, 320, 450],
+    HT     = [120, 200, 320],
     METBE  = [80, 100, 120, 150],
     METHF  = [80, 100, 120, 150],
     JetET  = [35, 90, 120, 180]
@@ -236,7 +236,7 @@ class Analyzer(BaseAnalyzer):
 
             params = [
                 cfg.on_title, cfg.off_title + " (GeV)", puBins, thresholds,
-                100, cfg.min, cfg.max,
+                80, cfg.min, cfg.max,
             ]
             if high_range:
                 params = [

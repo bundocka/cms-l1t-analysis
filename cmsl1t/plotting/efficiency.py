@@ -192,6 +192,51 @@ class EfficiencyPlot(BasePlotter):
             "all", "all_overlay_with_Emu", hists, fits, labels, self.online_title,
         )
 
+        label_template = '{online_title} > {threshold} GeV'
+        for pileup in self.pileup_bins:
+            hists = []
+            labels = []
+            fits = []
+            for threshold in self.thresholds:
+                if not isinstance(threshold, int):
+                    continue
+                hist = self.efficiencies.get_bin_contents([pileup, threshold])
+                hist.drawstyle = "P"
+                hists.append(hist)
+
+                label = label_template.format(
+                    online_title=self.online_title,
+                    threshold=self.thresholds.bins[threshold],
+                )
+                labels.append(label)
+                if with_fits:
+                    fits.append(self.fits.get_bin_contents(
+                        [bn.Base.everything, threshold]))
+
+            for threshold in self.thresholds:
+                if not isinstance(threshold, int):
+                    continue
+
+                hist = emu_plotter.efficiencies.get_bin_contents([pileup,threshold])
+                hist.drawstyle = "P"
+                hist.markerstyle = 23
+                hists.append(hist)
+
+                label = label_template.format(
+                    online_title=emu_plotter.online_title + ' Emu',
+                    threshold=emu_plotter.thresholds.bins[threshold],
+                )
+                labels.append(label)
+                if with_fits:
+                    fits.append(emu_plotter.fits.get_bin_contents(
+                        [bn.Base.everything, threshold]))
+
+            labels.append(str(self.pileup_bins.bins[pileup]))
+            self.__make_overlay(
+                pileup, "_overlay_with_Emu", hists, fits, labels, self.online_title,
+            )
+
+
         '''
         # Overlay individual pile-up bins for each threshold
         for threshold in self.thresholds:
