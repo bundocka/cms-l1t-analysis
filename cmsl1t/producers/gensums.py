@@ -9,7 +9,7 @@ class Producer(BaseProducer):
 
     def __init__(self, inputs, outputs, **kwargs):
         self._expected_input_order = ['jetPt', 'partId', 'partPhi', 'partPt', 'partEta',
-                                      'genMetTrue', 'genMetCalo']
+                                      'genMetTrue']
         super(Producer, self).__init__(inputs, outputs, **kwargs)
 
     def produce(self, event):
@@ -17,7 +17,7 @@ class Producer(BaseProducer):
         variables = [event[i] for i in self._inputs]
         prefix = self._outputs[0] + '_'
 
-        jet_pt, part_id, partPhi, partPt, partEta, genMetTrue, genMetCalo = variables
+        jet_pt, part_id, partPhi, partPt, partEta, genMetTrue = variables
         setattr(event, prefix + 'HT', EnergySum(np.sum(jet_pt)))
 
         part_id = np.absolute(part_id)

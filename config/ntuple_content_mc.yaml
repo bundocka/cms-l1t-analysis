@@ -277,9 +277,9 @@ content:
       Generator.genMetTrue:
         aliases:
         - event.Generator_genMetTrue
-      Generator.genMetCalo:
-        aliases:
-        - event.Generator_genMetCalo
+      #Generator.genMetCalo:
+      #  aliases:
+      #  - event.Generator_genMetCalo
 
   l1HOTree/L1HOTree:
     name: L1HOTree

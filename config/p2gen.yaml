@@ -1,0 +1,80 @@
+version: 1
+name: 'Jet Met MC Studies'
+
+input:
+  ntuple_map_file: config/ntuple_content_mc.yaml
+  files:
+      # QCD MC
+       # -   root://eoscms.cern.ch//eos/cms/store/group/dpg_trigger/comm_trigger/L1Trigger/bundocka/cmsl1t/100X_jec.root
+       - vbfPetPU0.root
+       #- zmumuPU0.root
+  sample:
+    name: MC
+    title: 1050XMC
+  trigger:
+    name: p2GenMet
+    title: ttbar
+  pileup_file: ""
+  run_number:
+
+analysis:
+  load_trees:
+    - emuUpgrade
+    - event
+    - genTree
+    - p2Upgrade
+
+  do_fit: True
+  pu_type: 0PU24,25PU49,50PU
+  pu_bins: [0,25,50,999]
+  thresholds:
+    HT:           [120, 200, 320]
+    HT_Emu:       [120, 200, 320]
+    METBE:        [80, 100, 120]
+    METBE_Emu:    [80, 100, 120]
+    METHF:        [80, 100, 120]
+    METHF_Emu:    [80, 100, 120]
+    JetET_BE:     [35, 90, 120]
+    JetET_BE_Emu: [35, 90, 120]
+    JetET_HF:     [35, 90, 120]
+    JetET_HF_Emu: [35, 90, 120]
+
+  analyzers:
+     jetMet_analyzer:
+       module: cmsl1t.analyzers.phase2_jetMet_analyzer
+  producers:
+    l1Sums:
+      module: cmsl1t.producers.l1sums
+      inputs:
+        - emu_L1Phase2Calo_sumBx
+        - emu_L1Phase2Calo_sumType
+        - emu_L1Phase2Calo_sumEt
+        - emu_L1Phase2Calo_sumPhi
+      outputs:
+        - l1Sums
+    l1EmuSums:
+      module: cmsl1t.producers.l1sums
+      inputs:
+        - emu_L1Upgrade_sumBx
+        - emu_L1Upgrade_sumType
+        - emu_L1Upgrade_sumEt
+        - emu_L1Upgrade_sumPhi
+      outputs:
+        - l1EmuSums
+    genSums:
+      module: cmsl1t.producers.gensums
+      inputs:
+        - Generator_jetPt
+        - Generator_partId
+        - Generator_partPhi
+        - Generator_partPt
+        - Generator_partEta
+        - Generator_genMetTrue
+        #- Generator_genMetCalo
+      outputs:
+        - genSums
+
+output:
+  template:
+     - output/constant_rate_turnons
+     - "{date}_{sample_name}_{trigger_name}"
