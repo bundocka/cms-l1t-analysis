@@ -274,6 +274,13 @@ content:
       Generator.weight:
         aliases:
         - event.Generator_weight
+      Generator.genMetTrue:
+        aliases:
+        - event.Generator_genMetTrue
+      Generator.genMetCalo:
+        aliases:
+        - event.Generator_genMetCalo
+
   l1HOTree/L1HOTree:
     name: L1HOTree
     optional: false
@@ -302,6 +309,31 @@ content:
       L1HO.nHcalQIESamples:
         aliases:
         - event.L1HO_nHcalQIESamples
+  l1Phase2CaloEmuTree/L1Phase2CaloTree:
+    name: L1Phase2Calo
+    optional: false
+    branches:
+      L1Phase2Calo.nSums:
+        aliases:
+        - event.emu_L1Phase2Calo_nSums
+      L1Phase2Calo.sumBx:
+        aliases:
+        - event.emu_L1Phase2Calo_sumBx
+      L1Phase2Calo.sumEt:
+        aliases:
+        - event.emu_L1Phase2Calo_sumEt
+      L1Phase2Calo.sumIEt:
+        aliases:
+        - event.emu_L1Phase2Calo_sumIEt
+      L1Phase2Calo.sumIPhi:
+        aliases:
+        - event.emu_L1Phase2Calo_sumIPhi
+      L1Phase2Calo.sumPhi:
+        aliases:
+        - event.emu_L1Phase2Calo_sumPhi
+      L1Phase2Calo.sumType:
+        aliases:
+        - event.emu_L1Phase2Calo_sumType
   l1UpgradeEmuTree/L1UpgradeTree:
     name: L1UpgradeTree
     optional: false

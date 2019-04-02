@@ -4,7 +4,7 @@ import os
 import requests
 
 # should we make this into a parameter
-CMSSW_BRANCH = 'l1t-integration-CMSSW_9_2_8'
+CMSSW_BRANCH = 'l1t-phase2-v2.16.42'
 BASE_URL = 'https://raw.githubusercontent.com/cms-l1t-offline/cmssw/{0}/L1Trigger/L1TNtuples/interface/'.format(
     CMSSW_BRANCH)
 files_to_load = [
@@ -52,6 +52,12 @@ for f in files_to_load:
         out.write(r.content)
     output_files.append(output_file)
 
+output_file = os.path.join(DST, 'L1AnalysisL1Phase2CaloDataFormat.h')
+input_file = 'https://raw.githubusercontent.com/bundocka/cmssw/p2Met/L1Trigger/L1TNtuples/interface/L1AnalysisL1Phase2CaloDataFormat.h'
+r = requests.get(input_file)
+with open(output_file, 'wb') as out:
+    out.write(r.content)
+output_files.append(output_file)
 
 # create combined header for easier compilation
 combined_header = os.path.join(DST, 'L1AnalysisAllDataformats.h')

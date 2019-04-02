@@ -8,14 +8,16 @@ from .base import BaseProducer
 class Producer(BaseProducer):
 
     def __init__(self, inputs, outputs, **kwargs):
-        self._expected_input_order = ['jetPt', 'partId', 'partPhi', 'partPt', 'partEta', ]
+        self._expected_input_order = ['jetPt', 'partId', 'partPhi', 'partPt', 'partEta',
+                                      'genMetTrue', 'genMetCalo']
         super(Producer, self).__init__(inputs, outputs, **kwargs)
 
     def produce(self, event):
+
         variables = [event[i] for i in self._inputs]
         prefix = self._outputs[0] + '_'
 
-        jet_pt, part_id, partPhi, partPt, partEta = variables
+        jet_pt, part_id, partPhi, partPt, partEta, genMetTrue, genMetCalo = variables
         setattr(event, prefix + 'HT', EnergySum(np.sum(jet_pt)))
 
         part_id = np.absolute(part_id)
@@ -24,11 +26,11 @@ class Producer(BaseProducer):
         partPt = np.array(partPt)
 
         # nu_e, mu, nu_mu, nu_tau
-        particleMask = (part_id == 12) | (part_id == 13) | (part_id == 14) | (part_id == 16)
+        particleMask     = (part_id == 12) | (part_id == 13) | (part_id == 14) | (part_id == 16)
         eta_mask = partEta < 3.0
 
         genMetHF = self._calculate_met(partPt, partPhi, particleMask)
-        setattr(event, prefix + 'MetHF', genMetHF)
+        setattr(event, prefix + 'MetHF', Met(genMetTrue, 0))
 
         genMetBE = self._calculate_met(partPt, partPhi, particleMask & eta_mask)
         setattr(event, prefix + 'MetBE', genMetBE)
