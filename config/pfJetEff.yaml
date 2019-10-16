@@ -5,8 +5,7 @@ input:
   ntuple_map_file: config/ntuple_content_mc.yaml
   files:
       # QCD MC
-#       - 9x9wc.root
-       - /eos/cms/store/group/dpg_trigger/comm_trigger/L1Trigger/bundocka/condor/pfjetsnc7x7/11*.root
+       - 5x5morejets.root
   sample:
     name: MC
     title: TDR

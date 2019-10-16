@@ -470,22 +470,6 @@ class Analyzer(BaseAnalyzer):
                     genL1JetEt = genL1Jet.et
                 else:
                     genL1JetEt = 0.
-                    if leadingGenJet.et > 350 and False:
-                        print("Gen jet Et = " + str(leadingGenJet.et)[:4] + ", eta = " + 
-                              str(leadingGenJet.eta)[:4] + ", phi = " + str(leadingGenJet.phi)[:4] + '\n')
-    #                    print("L1  jet Et = " + str(genL1JetEt))
-                        if genL1EmuJetEt > 0:
-                            print("AK4 jet Et = " + str(genL1EmuJet.et)[:4] + ", eta = " + 
-                                  str(genL1EmuJet.eta)[:4] + ", phi = " + str(genL1EmuJet.phi)[:4] + '\n')    
-                        jetpts = [str(jet.et)[:4] for jet in event.l1Jets]
-                        jetetas = [str(jet.eta)[:4] for jet in event.l1Jets]
-                        jetphis = [str(jet.phi)[:4] for jet in event.l1Jets]
-                        print(jetpts)
-                        print(jetetas)
-                        print(jetphis)
-                        print '\n'
-                        
-                    #return True
 
 
                 for region in genFillRegions:

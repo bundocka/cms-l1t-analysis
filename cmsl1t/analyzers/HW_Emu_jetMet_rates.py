@@ -18,7 +18,7 @@ from cmsl1t.utils.hist import cumulative_hist, normalise_to_collision_rate
 
 
 def types():
-    sum_types = ["HT", "METBE", "METHF"]
+    sum_types = ["HT"]#, "METBE", "METHF"]
     jet_types = ["JetET_BE", "JetET_HF"]
     sum_types += [t + '_Emu' for t in sum_types]
     jet_types += [t + '_Emu' for t in jet_types]
@@ -63,20 +63,20 @@ class Analyzer(BaseAnalyzer):
         self.thresholds = self.params['thresholds']
         self.puBins = self.params['pu_bins']
 
-        lumiMuDict = dict()
-        with open(os.path.join(cmsl1t.PROJECT_ROOT, 'run_lumi.csv'), 'rb') as runLumiFile:
-            reader = csv.reader(runLumiFile, delimiter=',')
-            for line in reader:
-                lumiMuDict[(int(line[1]),int(line[2]))] = float(line[3])
-        self._lumiMu = lumiMuDict
+        #lumiMuDict = dict()
+        #with open(os.path.join(cmsl1t.PROJECT_ROOT, 'run_lumi.csv'), 'rb') as runLumiFile:
+        #    reader = csv.reader(runLumiFile, delimiter=',')
+        #    for line in reader:
+        #        lumiMuDict[(int(line[1]),int(line[2]))] = float(line[3])
+        #self._lumiMu = lumiMuDict
 
-        self._lumiFilter = None
-        self._lumiJson = self.params['lumiJson']
-        if self._lumiJson:
-            self._lumiFilter = LuminosityFilter(self._lumiJson)
+        #self._lumiFilter = None
+        #self._lumiJson = self.params['lumiJson']
+        #if self._lumiJson:
+        #    self._lumiFilter = LuminosityFilter(self._lumiJson)
 
         self._lastRunAndLumi = (-1, -1)
-        self._processLumi = True
+        self._processLumi = False
         self._sumTypes, self._jetTypes = types()
 
         for name in self._sumTypes + self._jetTypes:
@@ -103,7 +103,7 @@ class Analyzer(BaseAnalyzer):
                         'Error: Please specify thresholds in the config .yaml in dictionary format')
 
             rates_plot = getattr(self, name + "_rates")
-            rates_plot.build("L1 " + name, puBins, 200, 0, 200, ETA_RANGES.get(name))
+            rates_plot.build("L1 " + name, puBins, 400, 0, 400, ETA_RANGES.get(name))
 
             rate_vs_pileup_plot = getattr(self, name + "_rate_vs_pileup")
             rate_vs_pileup_plot.build("L1 " + name, trig_thresholds, 18, 20, 56, ETA_RANGES.get(name))
@@ -125,8 +125,8 @@ class Analyzer(BaseAnalyzer):
     '''
 
     def fill_histograms(self, entry, event):
-        if not self._passesLumiFilter(event['run'], event['lumi']):
-            return True
+        #if not self._passesLumiFilter(event['run'], event['lumi']):
+        #    return True
         # Get pileup if ntuples have reco trees in them.
         # If not, set PU to 1 so that it fills the (only) pu bin.
 
@@ -135,18 +135,24 @@ class Analyzer(BaseAnalyzer):
         except AttributeError:
             pileup = 1.
 
-        pileup = self._lumiMu[(event['run'],event['lumi'])]        
+        #pileup = self._lumiMu[(event['run'],event['lumi'])]        
 
         #if self._lumiMu[(event['run'],event['lumi'])] < 50:
         #    return True
 
-
+        
         # Sums:
-        online = extractSums(event)
-        for name in self._sumTypes:
-            on = online[name]
-            getattr(self, name + "_rates").fill(pileup, on.et)
-            getattr(self, name + "_rate_vs_pileup").fill(pileup, on.et)
+        #online = extractSums(event)
+        #for name in self._sumTypes:
+           #on = online[name] 
+            #getattr(self, name + "_rates").fill(pileup, on.et)
+            #getattr(self, name + "_rate_vs_pileup").fill(pileup, on.et)
+
+        l1HT  = np.sum(jet.et for jet in event.l1Jets if jet.et>30)
+        l1EmuHT  = np.sum(jet.et for jet in event.l1EmuJets if jet.et>30)
+
+        getattr(self, "HT_rates").fill(pileup, l1HT)
+        getattr(self, "HT_Emu_rates").fill(pileup, l1EmuHT)
 
         # All jets:
         l1JetEts = [jet.et for jet in event.l1Jets]
