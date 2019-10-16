@@ -30,7 +30,7 @@ def types(doEmu, doReco, doGen):
         jet_types.extend(["caloJetET_BE", "caloJetET_HF",
                           "pfJetET_BE", "pfJetET_HF"])
     if doGen:
-        sum_types.extend(["genHT", "genMETHF", "genMETBE"])
+        sum_types.extend(["genHT"])#, "genMETHF", "genMETBE"])
         jet_types.extend(["genJetET_BE", "genJetET_HF"])
     if doEmu:
         sum_types += [t + '_Emu' for t in sum_types]
@@ -95,25 +95,25 @@ def extractSums(event, doEmu, doReco, doGen):
 
     if doGen:
         offline.update(dict(
-            genHT=event.genSums_HT,
-            genMETHF=event.genSums_MetHF,
-            genMETBE=event.genSums_MetBE,
+            #genHT=event.genSums_HT,
+            #genMETHF=event.genSums_MetHF,
+            #genMETBE=event.genSums_MetBE,
         ))
         online.update(dict(
-            genHT=event.l1Sums_Htt,
-            genMETHF=event.l1Sums_MetHF,
-            genMETBE=event.l1Sums_Met,
+            #genHT=event.l1Sums_Htt,
+            #genMETHF=event.l1Sums_MetHF,
+            #genMETBE=event.l1Sums_Met,
         ))
         if doEmu:
             offline.update(dict(
-                genHT_Emu=event.genSums_HT,
-                genMETHF_Emu=event.genSums_MetHF,
-                genMETBE_Emu=event.genSums_MetBE,
+                #genHT_Emu=event.genSums_HT,
+                #genMETHF_Emu=event.genSums_MetHF,
+                #genMETBE_Emu=event.genSums_MetBE,
             ))
             online.update(dict(
-                genHT_Emu=event.l1EmuSums_Htt,
-                genMETHF_Emu=event.l1EmuSums_MetHF,
-                genMETBE_Emu=event.l1EmuSums_Met,
+                #genHT_Emu=event.l1EmuSums_Htt,
+                #genMETHF_Emu=event.l1EmuSums_MetHF,
+                #genMETBE_Emu=event.l1EmuSums_Met,
             ))
     return offline, online
 
@@ -143,7 +143,7 @@ class Analyzer(BaseAnalyzer):
         # or even move out into separate calls of the same analyzer
         loaded_trees = self.params['load_trees']
         self._doVertex = 'recoTree' in loaded_trees
-        self._doEmu = 'emuUpgrade' in loaded_trees
+        self._doEmu = True#'emuUpgrade' in loaded_trees
         self._doReco = 'recoTree' in loaded_trees
         self._doGen = 'genTree' in loaded_trees
 
@@ -235,8 +235,8 @@ class Analyzer(BaseAnalyzer):
         if self._doGen:
             cfgs.extend([
                 Config("genHT", "Gen HT", "L1 HT", 30, 830),
-                Config("genMETHF", "Gen MET HF", "L1 MET HF", 0, 400),
-                Config("genMETBE", "Gen MET BE", "L1 MET BE", 0, 400),
+                #Config("genMETHF", "Gen MET HF", "L1 MET HF", 0, 400),
+                #Config("genMETBE", "Gen MET BE", "L1 MET BE", 0, 400),
                 Config("genJetET_BE", "Central Gen Jet ET",
                        "L1 Jet ET", 20, 420),
                 Config("genJetET_HF", "Forward Gen Jet ET",
@@ -367,8 +367,8 @@ class Analyzer(BaseAnalyzer):
 
     def fill_histograms(self, entry, event):
 
-        if not self._passesLumiFilter(event.run, event.lumi):
-            return True
+        #if not self._passesLumiFilter(event.run, event.lumi):
+        #    return True
 
         offline, online = extractSums(
             event, self._doEmu, self._doReco, self._doGen)
@@ -381,13 +381,14 @@ class Analyzer(BaseAnalyzer):
         if self._doGen:
             genNVtx = event.Generator_nVtx
 
-        pileup = self._lumiMu[(event['run'],event['lumi'])]
+        #pileup = self._lumiMu[(event['run'],event['lumi'])]
         #print pileup
         #if pileup >= 60 or pileup < 50:
         #    return True
 
 
         for name in self._sumTypes:
+            continue
             if 'pfMET' in name and not pfMetFilter(event):
                 continue
             on = online[name]
@@ -429,6 +430,7 @@ class Analyzer(BaseAnalyzer):
             leadingGenJet = None
             if event.goodGenJets:
                 leadingGenJet = event.goodGenJets[0]
+                genHT = np.sum(jet.et for jet in event.goodGenJets if jet.et>30)
 
             if leadingGenJet:
 
@@ -439,6 +441,11 @@ class Analyzer(BaseAnalyzer):
                     genFillRegions = ['HF']
 
                 if self._doEmu:
+
+                    l1EmuHT  = np.sum(jet.et for jet in event.l1EmuJets if jet.et>30)
+                    getattr(self, 'genHT_Emu_eff').fill(0, genHT, l1EmuHT)
+
+
                     genL1EmuJet = match(leadingGenJet, event.l1EmuJets)
                     if genL1EmuJet:
                         genL1EmuJetEt = genL1EmuJet.et
@@ -447,26 +454,47 @@ class Analyzer(BaseAnalyzer):
 
                     for region in genFillRegions:
                         for suffix in ['_eff', '_res', '_2D', '_eff_HR', '_2D_HR']:
-                            if '_res' in suffix and (genL1EmuJetEt == 0 or leadingGenJet.etCorr < 30):
+                            if '_res' in suffix and (genL1EmuJetEt == 0 or leadingGenJet.et < 30):
                                 continue
                             name = 'genJetET_{0}_Emu{1}'.format(region, suffix)
                             getattr(self, name).fill(
-                                genNVtx, leadingGenJet.etCorr, genL1EmuJetEt,
+                                genNVtx, leadingGenJet.et, genL1EmuJetEt,
                             )
+
+                    
+                l1HT  = np.sum(jet.et for jet in event.l1Jets if jet.et>30)
+                getattr(self, 'genHT_eff').fill(0, genHT, l1HT)
 
                 genL1Jet = match(leadingGenJet, event.l1Jets)
                 if genL1Jet:
                     genL1JetEt = genL1Jet.et
                 else:
                     genL1JetEt = 0.
+                    if leadingGenJet.et > 350 and False:
+                        print("Gen jet Et = " + str(leadingGenJet.et)[:4] + ", eta = " + 
+                              str(leadingGenJet.eta)[:4] + ", phi = " + str(leadingGenJet.phi)[:4] + '\n')
+    #                    print("L1  jet Et = " + str(genL1JetEt))
+                        if genL1EmuJetEt > 0:
+                            print("AK4 jet Et = " + str(genL1EmuJet.et)[:4] + ", eta = " + 
+                                  str(genL1EmuJet.eta)[:4] + ", phi = " + str(genL1EmuJet.phi)[:4] + '\n')    
+                        jetpts = [str(jet.et)[:4] for jet in event.l1Jets]
+                        jetetas = [str(jet.eta)[:4] for jet in event.l1Jets]
+                        jetphis = [str(jet.phi)[:4] for jet in event.l1Jets]
+                        print(jetpts)
+                        print(jetetas)
+                        print(jetphis)
+                        print '\n'
+                        
+                    #return True
+
 
                 for region in genFillRegions:
                     for suffix in ['_eff', '_res', '_2D', '_eff_HR', '_2D_HR']:
-                        if '_res' in suffix and (genL1JetEt == 0 or leadingGenJet.etCorr < 30):
+                        if '_res' in suffix and (genL1JetEt == 0 or leadingGenJet.et < 30):
                             continue
                         name = 'genJetET_{0}{1}'.format(region, suffix)
                         getattr(self, name).fill(
-                            genNVtx, leadingGenJet.etCorr, genL1JetEt,
+                            genNVtx, leadingGenJet.et, genL1JetEt,
                         )
 
         if self._doReco:
@@ -646,30 +674,30 @@ class Analyzer(BaseAnalyzer):
 
         if self._doGen:
             getattr(self, 'genHT_eff').draw()
-            getattr(self, 'genMETBE_eff').draw()
-            getattr(self, 'genMETHF_eff').draw()
+            #getattr(self, 'genMETBE_eff').draw()
+            #getattr(self, 'genMETHF_eff').draw()
             getattr(self, 'genJetET_BE_eff').draw()
             getattr(self, 'genJetET_HF_eff').draw()
 
             getattr(self, 'genHT_eff_HR').draw()
-            getattr(self, 'genMETBE_eff_HR').draw()
-            getattr(self, 'genMETHF_eff_HR').draw()
+            #getattr(self, 'genMETBE_eff_HR').draw()
+            #getattr(self, 'genMETHF_eff_HR').draw()
             getattr(self, 'genJetET_BE_eff_HR').draw()
             getattr(self, 'genJetET_HF_eff_HR').draw()
 
             getattr(self, 'genHT_res').draw()
-            getattr(self, 'genMETBE_res').draw()
-            getattr(self, 'genMETHF_res').draw()
+            #getattr(self, 'genMETBE_res').draw()
+            #getattr(self, 'genMETHF_res').draw()
             getattr(self, 'genJetET_BE_res').draw()
             getattr(self, 'genJetET_HF_res').draw()
 
             if self._doEmu:
                 getattr(self, 'genHT_eff').overlay_with_emu(
                     getattr(self, 'genHT_Emu_eff'))
-                getattr(self, 'genMETBE_eff').overlay_with_emu(
-                    getattr(self, 'genMETBE_Emu_eff'))
-                getattr(self, 'genMETHF_eff').overlay_with_emu(
-                    getattr(self, 'genMETHF_Emu_eff'))
+                #getattr(self, 'genMETBE_eff').overlay_with_emu(
+                #    getattr(self, 'genMETBE_Emu_eff'))
+                #getattr(self, 'genMETHF_eff').overlay_with_emu(
+                #    getattr(self, 'genMETHF_Emu_eff'))
                 getattr(self, 'genJetET_BE_eff').overlay_with_emu(
                     getattr(self, 'genJetET_BE_Emu_eff'))
                 getattr(self, 'genJetET_HF_eff').overlay_with_emu(
@@ -677,10 +705,10 @@ class Analyzer(BaseAnalyzer):
 
                 getattr(self, 'genHT_res').overlay_with_emu(
                     getattr(self, 'genHT_Emu_res'))
-                getattr(self, 'genMETBE_res').overlay_with_emu(
-                    getattr(self, 'genMETBE_Emu_res'))
-                getattr(self, 'genMETHF_res').overlay_with_emu(
-                    getattr(self, 'genMETHF_Emu_res'))
+                #getattr(self, 'genMETBE_res').overlay_with_emu(
+                #    getattr(self, 'genMETBE_Emu_res'))
+                #getattr(self, 'genMETHF_res').overlay_with_emu(
+                #    getattr(self, 'genMETHF_Emu_res'))
                 getattr(self, 'genJetET_BE_Emu_res').overlay_with_emu(
                     getattr(self, 'genJetET_BE_Emu_res'))
                 getattr(self, 'genJetET_HF_Emu_res').overlay_with_emu(

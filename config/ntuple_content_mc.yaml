@@ -184,7 +184,7 @@ content:
         - event.L1CaloTower_phi
   l1EventTree/L1EventTree:
     name: L1EventTree
-    optional: false
+    optional: true
     branches:
       Event.bx:
         aliases:
@@ -216,8 +216,8 @@ content:
       Event.time:
         aliases:
         - event.time
-  l1GeneratorTree/L1GenTree:
-    name: L1GenTree
+  genTree/L1GenTree:
+    name: Generator
     optional: false
     branches:
       Generator.jetEta:
@@ -274,6 +274,13 @@ content:
       Generator.weight:
         aliases:
         - event.Generator_weight
+      #Generator.genMetTrue:
+      #  aliases:
+      #  - event.Generator_genMetTrue
+      #Generator.genMetCalo:
+      #  aliases:
+      #  - event.Generator_genMetCalo
+
   l1HOTree/L1HOTree:
     name: L1HOTree
     optional: false
@@ -302,6 +309,35 @@ content:
       L1HO.nHcalQIESamples:
         aliases:
         - event.L1HO_nHcalQIESamples
+  l1PhaseIPFJetTree/L1PhaseIPFJetTree:
+    name: L1PhaseIPFJet
+    optional: false
+    branches:
+      L1PhaseIPFJet.nPhaseIPFJets:
+        aliases:
+        - event.L1PhaseIPFJet_nPhaseIPFJets
+      L1PhaseIPFJet.phaseIPFJetEt:
+        aliases:
+        - event.L1PhaseIPFJet_phaseIPFJetEt
+      L1PhaseIPFJet.phaseIPFJetEta:
+        aliases:
+        - event.L1PhaseIPFJet_phaseIPFJetEta
+      L1PhaseIPFJet.phaseIPFJetPhi:
+        aliases:
+        - event.L1PhaseIPFJet_phaseIPFJetPhi
+      L1PhaseIPFJet.nAK4PFJets:
+        aliases:
+        - event.L1AK4PFJet_nAK4PFJets
+      L1PhaseIPFJet.ak4PFJetEt:
+        aliases:
+        - event.L1AK4PFJet_ak4PFJetEt
+      L1PhaseIPFJet.ak4PFJetEta:
+        aliases:
+        - event.L1AK4PFJet_ak4PFJetEta
+      L1PhaseIPFJet.ak4PFJetPhi:
+        aliases:
+        - event.L1AK4PFJet_ak4PFJetPhi
+
   l1UpgradeEmuTree/L1UpgradeTree:
     name: L1UpgradeTree
     optional: false

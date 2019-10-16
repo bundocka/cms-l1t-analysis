@@ -166,7 +166,7 @@ class EfficiencyPlot(BasePlotter):
             hists.append(hist)
 
             label = label_template.format(
-                online_title='L1 MET HF PUS On',
+                online_title='Phase I PF Jet',
                 threshold=self.thresholds.bins[threshold],
             )
             labels.append(label)
@@ -184,7 +184,7 @@ class EfficiencyPlot(BasePlotter):
             hists.append(hist)
 
             label = label_template.format(
-                online_title='L1 MET HF PUS Off',
+                online_title='AK4 PF Jet',
                 threshold=emu_plotter.thresholds.bins[threshold],
             )
             labels.append(label)
@@ -242,7 +242,7 @@ class EfficiencyPlot(BasePlotter):
             xmax = hists[0].GetTotalHistogram().GetBinLowEdge(hists[0].GetTotalHistogram().GetNbinsX() + 1)
 
             # Draw each efficiency (with fit)
-            draw_args = {"xtitle": self.offline_title, "ytitle": "Efficiency", "xlimits": [50, 300]}
+            draw_args = {"xtitle": self.offline_title, "ytitle": "Efficiency", "xlimits": [20, 400]}
 
             canvas = draw(hists, draw_args=draw_args)
             if len(fits) > 0:
@@ -257,7 +257,7 @@ class EfficiencyPlot(BasePlotter):
             legend = Legend(
                 len(hists),
                 header=self.legend_title,
-                topmargin=0.4,
+                topmargin=0.35,
                 rightmargin=0.31,
                 leftmargin=0.69,
                 textsize=0.025,
@@ -271,12 +271,12 @@ class EfficiencyPlot(BasePlotter):
             legend.Draw()
 
             for val in [0.25, 0.5, 0.75, 0.95, 1.]:
-                line = ROOT.TLine(50, val, 300, val)
+                line = ROOT.TLine(20, val, 400, val)
                 line.SetLineStyle("dashed")
                 line.SetLineColor(15)
                 line.Draw()
 
-            for t in xrange(60,300,20):
+            for t in xrange(20,400,20):
                 line = ROOT.TLine(t, 0., t, 1.)
                 line.SetLineStyle("dashed")
                 line.SetLineColor(15)
