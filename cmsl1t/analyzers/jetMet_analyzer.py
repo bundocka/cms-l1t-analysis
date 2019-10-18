@@ -430,19 +430,19 @@ class Analyzer(BaseAnalyzer):
             leadingGenJet = None
             if event.goodGenJets:
                 leadingGenJet = event.goodGenJets[0]
-                genHT = np.sum(jet.et for jet in event.goodGenJets if jet.et>30)
+                genHT = np.sum(jet.et for jet in event.goodGenJets if (jet.et>30 and abs(jet.eta)<2.4))
 
             if leadingGenJet:
 
                 genFillRegions = []
                 if abs(leadingGenJet.eta) < 3.0:
                     genFillRegions = ['BE']
-                else:
+                elif abs(leadingGenJet.eta) < 5.0:
                     genFillRegions = ['HF']
 
                 if self._doEmu:
 
-                    l1EmuHT  = np.sum(jet.et for jet in event.l1EmuJets if jet.et>30)
+                    l1EmuHT  = np.sum(jet.et for jet in event.l1EmuJets if (jet.et>30 and abs(jet.eta)<2.4))
                     getattr(self, 'genHT_Emu_eff').fill(0, genHT, l1EmuHT)
 
 
@@ -462,7 +462,7 @@ class Analyzer(BaseAnalyzer):
                             )
 
                     
-                l1HT  = np.sum(jet.et for jet in event.l1Jets if jet.et>30)
+                l1HT  = np.sum(jet.et for jet in event.l1Jets if (jet.et>30 and abs(jet.eta)<2.4))
                 getattr(self, 'genHT_eff').fill(0, genHT, l1HT)
 
                 genL1Jet = match(leadingGenJet, event.l1Jets)

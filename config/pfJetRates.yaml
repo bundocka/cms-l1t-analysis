@@ -1,43 +1,37 @@
-version: 1
-name: 'Jet Met MC Studies'
+version: 0.0.1
+name: 'Jet Met Rates'
 
 input:
-  ntuple_map_file: config/ntuple_content_mc.yaml
   files:
-      # QCD MC
-       - 9x9.root
+      # Zero Bias
+        -  9x9SNu.root
   sample:
     name: MC
     title: TDR
   trigger:
     name: histPFJet
-    title: ttbar+QCD
+    title: SingleNeutrino
   pileup_file: ""
   run_number:
+  lumi_json: "https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions18/13TeV/PromptReco/Cert_314472-325175_13TeV_PromptReco_Collisions18_JSON.txt"
+  ntuple_map_file: config/ntuple_content_mc.yaml
 
 analysis:
   load_trees:
     - genTree
-    - p2Upgrade
-
   do_fit: True
   pu_type: 0PU24,25PU49,50PU
   pu_bins: [0,25,50,999]
   thresholds:
-    HT:           [120, 200, 320, 460]
-    HT_Emu:       [120, 200, 320, 460]
-    METBE:        [80, 100, 120]
-    METBE_Emu:    [80, 100, 120]
-    METHF:        [80, 100, 120]
-    METHF_Emu:    [80, 100, 120]
-    JetET_BE:     [35, 90, 120, 180]
-    JetET_BE_Emu: [35, 90, 120, 180]
-    JetET_HF:     [35, 90, 120, 180]
-    JetET_HF_Emu: [35, 90, 120, 180]
+    HT:       [120, 200, 320]
+    METBE:    [80, 100, 120]
+    METHF:    [80, 100, 120]
+    JetET_BE: [35, 90, 120, 180]
+    JetET_HF: [35, 90, 120, 180]
 
   analyzers:
-     jetMet_analyzer:
-       module: cmsl1t.analyzers.jetMet_analyzer
+     HW_Emu_jetMet_rates:
+       module: cmsl1t.analyzers.HW_Emu_jetMet_rates
   producers:
     l1Jets:
       module: cmsl1t.producers.jets
@@ -70,7 +64,8 @@ analysis:
       outputs:
         - goodGenJets
 
+
 output:
   template:
-     - output/constant_rate_turnons
-     - "{date}_{sample_name}_{trigger_name}"
+     - output/zb_rates
+     - "{date}_{run_number}_{sample_name}_{trigger_name}"

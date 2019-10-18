@@ -241,8 +241,16 @@ class EfficiencyPlot(BasePlotter):
             xmin = hists[0].GetTotalHistogram().GetBinLowEdge(1)
             xmax = hists[0].GetTotalHistogram().GetBinLowEdge(hists[0].GetTotalHistogram().GetNbinsX() + 1)
 
+            low = 20
+            high = 400
+            space = 20
+            
             # Draw each efficiency (with fit)
-            draw_args = {"xtitle": self.offline_title, "ytitle": "Efficiency", "xlimits": [20, 400]}
+            if 'HT' in name:
+                low=40
+                high=800
+                space=50
+            draw_args = {"xtitle": self.offline_title, "ytitle": "Efficiency", "xlimits": [low, high]}
 
             canvas = draw(hists, draw_args=draw_args)
             if len(fits) > 0:
@@ -271,12 +279,12 @@ class EfficiencyPlot(BasePlotter):
             legend.Draw()
 
             for val in [0.25, 0.5, 0.75, 0.95, 1.]:
-                line = ROOT.TLine(20, val, 400, val)
+                line = ROOT.TLine(low, val, high, val)
                 line.SetLineStyle("dashed")
                 line.SetLineColor(15)
                 line.Draw()
 
-            for t in xrange(20,400,20):
+            for t in xrange(low,high,space):
                 line = ROOT.TLine(t, 0., t, 1.)
                 line.SetLineStyle("dashed")
                 line.SetLineColor(15)
