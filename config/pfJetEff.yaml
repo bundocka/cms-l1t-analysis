@@ -5,7 +5,8 @@ input:
   ntuple_map_file: config/ntuple_content_mc.yaml
   files:
       # QCD MC
-       - /eos/cms/store/group/dpg_trigger/comm_trigger/L1Trigger/bundocka/cmsl1t/pfJets7x7Eff.root
+       - 9x9.root
+       #- qcd.root
   sample:
     name: MC
     title: TDR
@@ -23,12 +24,6 @@ analysis:
   pu_type: 0PU24,25PU49,50PU
   pu_bins: [0,25,50,999]
   thresholds:
-    HT:           [120, 200, 320, 460]
-    HT_Emu:       [120, 200, 320, 460]
-    METBE:        [80, 100, 120]
-    METBE_Emu:    [80, 100, 120]
-    METHF:        [80, 100, 120]
-    METHF_Emu:    [80, 100, 120]
     JetET_BE:     [35, 90, 120, 180]
     JetET_BE_Emu: [35, 90, 120, 180]
     JetET_HF:     [35, 90, 120, 180]
@@ -62,12 +57,13 @@ analysis:
     goodGenJets:
       module: cmsl1t.producers.jets
       inputs:
-        - L1GenJet_genJetEt	
-        - L1GenJet_genJetEta
-        - L1GenJet_genJetPhi
+        - Generator_jetPt
+        - Generator_jetEta
+        - Generator_jetPhi
       jetType: Gen
       outputs:
         - goodGenJets
+
 
 output:
   template:

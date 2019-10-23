@@ -20,7 +20,7 @@ import cmsl1t
 from cmsl1t.jet import match
 
 
-def types(doEmu, doReco, doGen):
+def types(doEmu, doReco, doGen, doPhase2):
 
     sum_types = []
     jet_types = []
@@ -29,9 +29,14 @@ def types(doEmu, doReco, doGen):
                           "caloMETBE", "pfMET_NoMu"])
         jet_types.extend(["caloJetET_BE", "caloJetET_HF",
                           "pfJetET_BE", "pfJetET_HF"])
-    if doGen:
+    if doGen and not doPhase2:
         sum_types.extend(["genHT", "genMETHF", "genMETBE"])
         jet_types.extend(["genJetET_BE", "genJetET_HF"])
+
+    if doPhase2:
+        #sum_types.extend(["genHT", "genMETHF", "genMETBE"])
+        jet_types.extend(["genJetET_BE", "genJetET_HF"])
+
     if doEmu:
         sum_types += [t + '_Emu' for t in sum_types]
         jet_types += [t + '_Emu' for t in jet_types]
@@ -143,12 +148,13 @@ class Analyzer(BaseAnalyzer):
         # or even move out into separate calls of the same analyzer
         loaded_trees = self.params['load_trees']
         self._doVertex = 'recoTree' in loaded_trees
-        self._doEmu = ('emuUpgrade' in loaded_trees) or ('p2Upgrade' in loaded_trees)
+        self._doEmu = 'emuUpgrade' in loaded_trees or 'p2Upgrade' in loaded_trees 
         self._doReco = 'recoTree' in loaded_trees
-        self._doGen = 'genTree' in loaded_trees
+        self._doGen = 'genTree' in loaded_trees or 'p2Upgrade' in loaded_trees 
+        self._doPhase2 = 'p2Upgrade' in loaded_trees
 
         self._sumTypes, self._jetTypes = types(
-            self._doEmu, self._doReco, self._doGen)
+            self._doEmu, self._doReco, self._doGen, self._doPhase2)
 
         for name in self._sumTypes:
             eff_plot = EfficiencyPlot("L1", "offline_" + name)
@@ -233,10 +239,12 @@ class Analyzer(BaseAnalyzer):
                        "L1 Jet ET", 20, 420),
             ])
         if self._doGen:
+            if not self._doPhase2:
+                cfgs.extend([
+                    Config("genHT", "Gen HT", "L1 HT", 30, 830),
+                    Config("genMETHF", "Gen MET HF", "L1 MET HF", 0, 400),
+                    Config("genMETBE", "Gen MET BE", "L1 MET BE", 0, 400)])
             cfgs.extend([
-                Config("genHT", "Gen HT", "L1 HT", 30, 830),
-                Config("genMETHF", "Gen MET HF", "L1 MET HF", 0, 400),
-                Config("genMETBE", "Gen MET BE", "L1 MET BE", 0, 400),
                 Config("genJetET_BE", "Central Gen Jet ET",
                        "L1 Jet ET", 20, 420),
                 Config("genJetET_HF", "Forward Gen Jet ET",
@@ -645,42 +653,48 @@ class Analyzer(BaseAnalyzer):
                     getattr(self, 'pfJetET_HF_Emu_res'))
 
         if self._doGen:
-            getattr(self, 'genHT_eff').draw()
-            getattr(self, 'genMETBE_eff').draw()
-            getattr(self, 'genMETHF_eff').draw()
+            if not self._doPhase2:
+                getattr(self, 'genHT_eff').draw()
+                getattr(self, 'genMETBE_eff').draw()
+                getattr(self, 'genMETHF_eff').draw()
+                
+                getattr(self, 'genHT_eff_HR').draw()
+                getattr(self, 'genMETBE_eff_HR').draw()
+                getattr(self, 'genMETHF_eff_HR').draw()
+
+                getattr(self, 'genHT_res').draw()
+                getattr(self, 'genMETBE_res').draw()
+                getattr(self, 'genMETHF_res').draw()
+
             getattr(self, 'genJetET_BE_eff').draw()
             getattr(self, 'genJetET_HF_eff').draw()
 
-            getattr(self, 'genHT_eff_HR').draw()
-            getattr(self, 'genMETBE_eff_HR').draw()
-            getattr(self, 'genMETHF_eff_HR').draw()
             getattr(self, 'genJetET_BE_eff_HR').draw()
             getattr(self, 'genJetET_HF_eff_HR').draw()
 
-            getattr(self, 'genHT_res').draw()
-            getattr(self, 'genMETBE_res').draw()
-            getattr(self, 'genMETHF_res').draw()
             getattr(self, 'genJetET_BE_res').draw()
             getattr(self, 'genJetET_HF_res').draw()
 
             if self._doEmu:
-                getattr(self, 'genHT_eff').overlay_with_emu(
-                    getattr(self, 'genHT_Emu_eff'))
-                getattr(self, 'genMETBE_eff').overlay_with_emu(
-                    getattr(self, 'genMETBE_Emu_eff'))
-                getattr(self, 'genMETHF_eff').overlay_with_emu(
-                    getattr(self, 'genMETHF_Emu_eff'))
+                if not self._doPhase2:
+                    getattr(self, 'genHT_eff').overlay_with_emu(
+                        getattr(self, 'genHT_Emu_eff'))
+                    getattr(self, 'genMETBE_eff').overlay_with_emu(
+                        getattr(self, 'genMETBE_Emu_eff'))
+                    getattr(self, 'genMETHF_eff').overlay_with_emu(
+                        getattr(self, 'genMETHF_Emu_eff'))
+
+                    getattr(self, 'genHT_res').overlay_with_emu(
+                        getattr(self, 'genHT_Emu_res'))
+                    getattr(self, 'genMETBE_res').overlay_with_emu(
+                        getattr(self, 'genMETBE_Emu_res'))
+                    getattr(self, 'genMETHF_res').overlay_with_emu(
+                        getattr(self, 'genMETHF_Emu_res'))
+
                 getattr(self, 'genJetET_BE_eff').overlay_with_emu(
                     getattr(self, 'genJetET_BE_Emu_eff'))
                 getattr(self, 'genJetET_HF_eff').overlay_with_emu(
                     getattr(self, 'genJetET_HF_Emu_eff'))
-
-                getattr(self, 'genHT_res').overlay_with_emu(
-                    getattr(self, 'genHT_Emu_res'))
-                getattr(self, 'genMETBE_res').overlay_with_emu(
-                    getattr(self, 'genMETBE_Emu_res'))
-                getattr(self, 'genMETHF_res').overlay_with_emu(
-                    getattr(self, 'genMETHF_Emu_res'))
                 getattr(self, 'genJetET_BE_Emu_res').overlay_with_emu(
                     getattr(self, 'genJetET_BE_Emu_res'))
                 getattr(self, 'genJetET_HF_Emu_res').overlay_with_emu(

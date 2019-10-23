@@ -63,6 +63,10 @@ class Analyzer(BaseAnalyzer):
         self.thresholds = self.params['thresholds']
         self.puBins = self.params['pu_bins']
 
+        loaded_trees = self.params['load_trees']
+        self._doGen = 'genTree' in loaded_trees or 'p2Upgrade' in loaded_trees 
+        self._doPhase2 = 'p2Upgrade' in loaded_trees
+
         lumiMuDict = dict()
         with open(os.path.join(cmsl1t.PROJECT_ROOT, 'run_lumi.csv'), 'rb') as runLumiFile:
             reader = csv.reader(runLumiFile, delimiter=',')
@@ -77,7 +81,11 @@ class Analyzer(BaseAnalyzer):
 
         self._lastRunAndLumi = (-1, -1)
         self._processLumi = True
-        self._sumTypes, self._jetTypes = types()
+
+        if self._doPhase2:
+            self._sumTypes, self._jetTypes = [],[]
+        else:
+            self._sumTypes, self._jetTypes = types()
 
         for name in self._sumTypes + self._jetTypes:
             rates_plot = RatesPlot(name)

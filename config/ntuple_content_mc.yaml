@@ -341,19 +341,19 @@ content:
         - event.L1GenJet_nGenJets
       L1PhaseIPFJet.genJetHt:
         aliases:
-        - event.L1GenJet_genJetHt
+        - event.Generator_jetHt
       L1PhaseIPFJet.genJetEt:
         aliases:
-        - event.L1GenJet_genJetEt
+        - event.Generator_jetPt
       L1PhaseIPFJet.genJetEta:
         aliases:
-        - event.L1GenJet_genJetEta
+        - event.Generator_jetEta
       L1PhaseIPFJet.genJetPhi:
         aliases:
-        - event.L1GenJet_genJetPhi
+        - event.Generator_jetPhi
       L1PhaseIPFJet.genJetM:
         aliases:
-        - event.L1GenJet_genJetM
+        - event.Generator_jetM
 
   l1UpgradeEmuTree/L1UpgradeTree:
     name: L1UpgradeTree
