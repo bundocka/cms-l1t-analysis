@@ -86,8 +86,8 @@ def __clean(hists):
             new = asrootpy(hist.CreateGraph("e0"))
             new.decorate(hist)
             hist = new
-            hist.SetMarkerSize(0.5)
-            hist.SetLineWidth(1)
+            hist.SetMarkerSize(1)
+            hist.SetLineWidth(5)
             gStyle.SetLineScalePS(1)
         else:
             gStyle.SetLineScalePS(3)
@@ -179,12 +179,12 @@ def label_canvas(sample_title=None, run=None, isData=False):
     latex.SetNDC()
     latex.SetTextFont(42)
 
-    cms = "#bf{CMS} Phase II #it{Simulation}"
+    cms = "#scale[0.8]{#bf{CMS} #it{Phase-2 Simulation}}"
     if sample_title:
         cms += sample_title
-    latex.DrawLatex(0.17, 0.92, cms)
+    latex.DrawLatex(0.1, 0.92, cms)
 
-    run_summary = "ttbar+QCD PU200"
+    run_summary = "#scale[0.8]{14 TeV   3000 fb^{-1}   200 PU}"
     if run:
         run_summary += run
     latex.SetTextAlign(31)

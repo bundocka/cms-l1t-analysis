@@ -42,7 +42,7 @@ def extractSums(event):
 # Eta ranges so we can put |\eta| < val as the legend header on the
 # efficiency plots.
 ETA_RANGES = dict(
-    HT="|\\eta| < 2.4",
+    HT="",
     METBE="|\\eta| < 3.0",
     METHF="|\\eta| < 5.0",
     JetET_BE="|\\eta| < 3.0",
@@ -103,7 +103,10 @@ class Analyzer(BaseAnalyzer):
                         'Error: Please specify thresholds in the config .yaml in dictionary format')
 
             rates_plot = getattr(self, name + "_rates")
-            rates_plot.build("L1 " + name, puBins, 400, 0, 400, ETA_RANGES.get(name))
+            if 'HT' in name:
+                rates_plot.build("L1 " + name, puBins, 40, 40, 440, ETA_RANGES.get(name))
+            else:
+                rates_plot.build("L1 " + name, puBins, 30, 00, 300, ETA_RANGES.get(name))
 
             rate_vs_pileup_plot = getattr(self, name + "_rate_vs_pileup")
             rate_vs_pileup_plot.build("L1 " + name, trig_thresholds, 18, 20, 56, ETA_RANGES.get(name))
@@ -273,7 +276,7 @@ class Analyzer(BaseAnalyzer):
                 hist = cumulative_hist(hist)
                 hist = normalise_to_collision_rate(hist)
                 setattr(self, plot.online_name, hist)
-                # plot.draw()
+                #plot.draw()
 
         print('  thresholds:')
 

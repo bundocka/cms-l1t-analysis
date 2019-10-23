@@ -13,7 +13,7 @@ def normalise_to_collision_rate(hist, collision_rate=4.0e7):
     first_bin = hist.get_bin_content(1)
     if first_bin != 0:
         hist.GetSumw2()
-        hist.Scale(collision_rate / first_bin)
+        hist.Scale(40000000/92000)#collision_rate / first_bin)
     return hist
 
 

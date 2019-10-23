@@ -8,6 +8,7 @@ import cmsl1t.hist.binning as bn
 from cmsl1t.utils.draw import draw, label_canvas
 from cmsl1t.utils.hist import cumulative_hist, normalise_to_collision_rate
 from cmsl1t.utils.hist import normalise_to_unit_area
+from rootpy.ROOT import gStyle, TLatex, TStyle
 
 
 from rootpy.context import preserve_current_style
@@ -59,7 +60,7 @@ class RatesPlot(BasePlotter):
                     self.pileup_bins.get_bin_center(pile_up))
             else:
                 continue
-            h.SetMarkerSize(0.5)
+#            h.SetMarkerSize(0.5)
             hists.append(h)
             labels.append(label)
             # if with_fits:
@@ -79,35 +80,45 @@ class RatesPlot(BasePlotter):
         hist = self.plots.get_bin_contents([bn.Base.everything])
         hist = cumulative_hist(hist)
 
-        hist.drawstyle = "EP"
-        hist.SetMarkerSize(0.5)
-        hist.SetMarkerColor(1)
+        hist.drawstyle = "histC"#"EP"
+#        hist.SetMarkerSize(0.5)
+        hist.SetMarkerColor(3)
+        hist.SetLineWidth(3)
+        hist.SetLineColor(10)
         # if with_fits:
         #    fit = self.fits.get_bin_contents([threshold])
         #    fits.append(fit)
         hists.append(hist)
-        labels.append("HW")
+        labels.append("9x9 Hist PF Jet")
 
         emu_hist = emu_plotter.plots.get_bin_contents([bn.Base.everything])
         emu_hist = cumulative_hist(emu_hist)
 
-        emu_hist.drawstyle = "EP"
-        emu_hist.SetMarkerSize(0.5)
-        emu_hist.SetMarkerColor(2)
+        emu_hist.drawstyle = "histC"#"EP"
+#        emu_hist.SetMarkerSize(0.5)
+        emu_hist.SetMarkerColor(4)
+        emu_hist.SetLineWidth(3)
         # if with_fits:
         #    emu_fit = self.fits.get_bin_contents([threshold])
         #    fits.append(emu_fit)
         hists.append(emu_hist)
-        labels.append("Emu")
+        labels.append("AK4 PF Jet")
 
-        self.__make_overlay(hists, fits, labels, "# Events", setlogy=True)
+        self.__make_overlay(hists, fits, labels, "Rate (Hz)", setlogy=True)
 
     def __make_overlay(self, hists, fits, labels, ytitle, suffix="", setlogy=False):
         with preserve_current_style():
+            name = self.filename_format.format(pileup="all")
             # Draw each resolution (with fit)
             xtitle = self.online_title
+            head = "#bf{#it{SingleNeutrino}}"
+            if 'HT' in name:
+                xtitle = '#it{H}_{T} (GeV)'
+                head = " #bf{#it{SingleNeutrino}}"
+            else:
+                xtitle = 'Jet #it{p}_{T}^{L1} (GeV)'  
             canvas = draw(hists, draw_args={
-                          "xtitle": xtitle, "ytitle": ytitle, "logy": setlogy})
+                          "xtitle": xtitle, "ytitle": ytitle, "logy": setlogy, "ylimits": (1000,50000000)})
             if fits:
                 for fit, hist in zip(fits, hists):
                     fit["asymmetric"].linecolor = hist.GetLineColor()
@@ -116,16 +127,23 @@ class RatesPlot(BasePlotter):
             # Add labels
             label_canvas()
 
+            if 'HT' in name:
+                latex = TLatex()
+                latex.SetNDC()
+                jetTex = "#scale[0.5]{#it{p}_{T} > 30 GeV \n |\\eta| < 2.4}"
+                latex.DrawLatex(0.65, 0.48, jetTex)
+            
             # Add a legend
             legend = Legend(
                 len(hists),
-                header=self.legend_title,
-                topmargin=0.35,
-                rightmargin=0.2,
-                leftmargin=0.8,
+                header=head,
+                topmargin=0.25,
+                leftmargin=0.5,
+                textsize=0.03,
                 entryheight=0.028
             )
             for hist, label in zip(hists, labels):
+                hist = normalise_to_collision_rate(hist)
                 legend.AddEntry(hist, label)
             legend.SetBorderSize(0)
             legend.Draw()

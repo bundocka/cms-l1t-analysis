@@ -217,8 +217,8 @@ class Analyzer(BaseAnalyzer):
         cfgs = []
         if self._doReco:
             cfgs.extend([
-                Config("caloHT", "Offline Calo HT", "L1 HT", 30, 830),
-                Config("pfHT", "Offline PF HT", "L1 HT", 30, 830),
+                Config("caloHT", "Offline Calo HT", "L1 HT", 30, 850),
+                Config("pfHT", "Offline PF HT", "L1 HT", 30, 850),
                 Config("caloMETHF", "Offline Calo MET HF", "L1 MET HF", 0, 400),
                 Config("caloMETBE", "Offline Calo MET BE", "L1 MET BE", 0, 400),
                 Config("pfMET_NoMu", "Offline PF MET NoMu",
@@ -234,7 +234,7 @@ class Analyzer(BaseAnalyzer):
             ])
         if self._doGen:
             cfgs.extend([
-                Config("genHT", "Gen HT", "L1 HT", 30, 830),
+                Config("genHT", "Gen HT", "L1 HT", 30, 850),
                 #Config("genMETHF", "Gen MET HF", "L1 MET HF", 0, 400),
                 #Config("genMETBE", "Gen MET BE", "L1 MET BE", 0, 400),
                 Config("genJetET_BE", "Central Gen Jet ET",

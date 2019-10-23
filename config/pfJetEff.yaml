@@ -5,7 +5,7 @@ input:
   ntuple_map_file: config/ntuple_content_mc.yaml
   files:
       # QCD MC
-       - 9x9.root
+       - 7x7check.root
   sample:
     name: MC
     title: TDR

@@ -24,8 +24,8 @@ setattr(Efficiency, "__iadd__", my_iadd)
 
 
 class EfficiencyPlot(BasePlotter):
-    drawstyle = 'HIST'
-    drawstyle_data = 'P'
+    drawstyle = 'HISTC'
+    drawstyle_data = 'PC'
     markerstyle_overlay = 23
 
     def __init__(self, online_name, offline_name):
@@ -60,11 +60,11 @@ class EfficiencyPlot(BasePlotter):
                     or array (bin edges) for constructing TEfficiency'''
             if isinstance(low, np.ndarray):
                 eff = asrootpy(
-                    ROOT.TEfficiency(this_name, this_title, n_bins, low)
+                    ROOT.TEfficiency(this_name, this_title, n_bins/2, low)
                 )
             else:
                 eff = asrootpy(
-                    ROOT.TEfficiency(this_name, this_title, n_bins, low, high)
+                    ROOT.TEfficiency(this_name, this_title, n_bins/2, low, high)
                 )
             eff.drawstyle = EfficiencyPlot.drawstyle
             return eff
@@ -155,7 +155,6 @@ class EfficiencyPlot(BasePlotter):
         hists = []
         labels = []
         fits = []
-        ROOT.gStyle.SetErrorX(0.)
         label_template = '{online_title} > {threshold} GeV'
         for threshold in all_pileup_effs.iter_all():
             if not isinstance(threshold, int):
@@ -164,9 +163,14 @@ class EfficiencyPlot(BasePlotter):
             hist.drawstyle = EfficiencyPlot.drawstyle_data
             self._dynamic_bin(hist)
             hists.append(hist)
+            
+            labelB = '7x7 Hist PF Jet'
+            if 'HT' in self.offline_name:
+                labelB = '7x7 Hist PF Jet #it{H}_{T}'
+
 
             label = label_template.format(
-                online_title='Phase I PF Jet',
+                online_title=labelB,
                 threshold=self.thresholds.bins[threshold],
             )
             labels.append(label)
@@ -180,17 +184,24 @@ class EfficiencyPlot(BasePlotter):
             hist = emu_pileup_effs.get_bin_contents(threshold)
             hist.drawstyle = EfficiencyPlot.drawstyle_data
             hist.markerstyle = EfficiencyPlot.markerstyle_overlay
+            hist.SetLineWidth(10)
             self._dynamic_bin(hist)
             hists.append(hist)
 
+            labelB = 'AK4 PF Jet'
+            if 'HT' in self.offline_name:
+                labelB = 'AK4 PF Jet #it{H}_{T}'
+
             label = label_template.format(
-                online_title='AK4 PF Jet',
+                online_title=labelB,
                 threshold=emu_plotter.thresholds.bins[threshold],
             )
             labels.append(label)
             if with_fits:
                 fits.append(emu_plotter.fits.get_bin_contents(
                     [bn.Base.everything, threshold]))
+                
+            
 
         self.__make_overlay(
             "all", "all_overlay_with_Emu", hists, fits, labels, self.online_title,
@@ -245,11 +256,15 @@ class EfficiencyPlot(BasePlotter):
             high = 400
             space = 20
             
+            self.offline_title = 'Gen Jet #it{p}_{T} (GeV)'
+
             # Draw each efficiency (with fit)
             if 'HT' in name:
-                low=40
-                high=800
+                low=50
+                high=850
                 space=50
+                self.offline_title = 'Gen #it{H}_{T} (GeV)'
+            
             draw_args = {"xtitle": self.offline_title, "ytitle": "Efficiency", "xlimits": [low, high]}
 
             canvas = draw(hists, draw_args=draw_args)
@@ -264,10 +279,10 @@ class EfficiencyPlot(BasePlotter):
             # Add a legend
             legend = Legend(
                 len(hists),
-                header=self.legend_title,
+                header=self.legend_title + "       #bf{#it{QCD + TTbar}}",
                 topmargin=0.35,
                 rightmargin=0.31,
-                leftmargin=0.69,
+                leftmargin=0.65,
                 textsize=0.025,
                 entryheight=0.028,
             )
