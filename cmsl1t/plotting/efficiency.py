@@ -166,7 +166,7 @@ class EfficiencyPlot(BasePlotter):
             hists.append(hist)
 
             label = label_template.format(
-                online_title='L1 MET HF PUS On',
+                online_title='L1 HW',
                 threshold=self.thresholds.bins[threshold],
             )
             labels.append(label)
@@ -184,7 +184,7 @@ class EfficiencyPlot(BasePlotter):
             hists.append(hist)
 
             label = label_template.format(
-                online_title='L1 MET HF PUS Off',
+                online_title='L1 EMU',
                 threshold=emu_plotter.thresholds.bins[threshold],
             )
             labels.append(label)
@@ -240,7 +240,7 @@ class EfficiencyPlot(BasePlotter):
 
             xmin = hists[0].GetTotalHistogram().GetBinLowEdge(1)
             xmax = hists[0].GetTotalHistogram().GetBinLowEdge(hists[0].GetTotalHistogram().GetNbinsX() + 1)
-
+            
             # Draw each efficiency (with fit)
             draw_args = {"xtitle": self.offline_title, "ytitle": "Efficiency", "xlimits": [50, 300]}
 
@@ -257,7 +257,7 @@ class EfficiencyPlot(BasePlotter):
             legend = Legend(
                 len(hists),
                 header=self.legend_title,
-                topmargin=0.4,
+                topmargin=0.35,
                 rightmargin=0.31,
                 leftmargin=0.69,
                 textsize=0.025,
