@@ -125,20 +125,16 @@ class Analyzer(BaseAnalyzer):
     '''
 
     def fill_histograms(self, entry, event):
-        if not self._passesLumiFilter(event['run'], event['lumi']):
-            return True
-        # Get pileup if ntuples have reco trees in them.
-        # If not, set PU to 1 so that it fills the (only) pu bin.
 
         try:
             pileup = event.nVertex
         except AttributeError:
             pileup = 1.
 
-        pileup = self._lumiMu[(event['run'],event['lumi'])]        
-
-        #if self._lumiMu[(event['run'],event['lumi'])] < 50:
-        #    return True
+        if not self._doGen:
+            if not self._passesLumiFilter(event['run'], event['lumi']):
+                return True
+            pileup = self._lumiMu[(event['run'],event['lumi'])]        
 
 
         # Sums:

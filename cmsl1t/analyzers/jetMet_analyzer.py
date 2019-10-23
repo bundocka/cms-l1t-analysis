@@ -143,7 +143,7 @@ class Analyzer(BaseAnalyzer):
         # or even move out into separate calls of the same analyzer
         loaded_trees = self.params['load_trees']
         self._doVertex = 'recoTree' in loaded_trees
-        self._doEmu = 'emuUpgrade' in loaded_trees
+        self._doEmu = ('emuUpgrade' in loaded_trees) or ('p2Upgrade' in loaded_trees)
         self._doReco = 'recoTree' in loaded_trees
         self._doGen = 'genTree' in loaded_trees
 
@@ -367,11 +367,6 @@ class Analyzer(BaseAnalyzer):
 
     def fill_histograms(self, entry, event):
 
-        if not self._passesLumiFilter(event.run, event.lumi):
-            return True
-
-        offline, online = extractSums(
-            event, self._doEmu, self._doReco, self._doGen)
 
         recoNVtx = 1
         genNVtx = 1
@@ -381,10 +376,15 @@ class Analyzer(BaseAnalyzer):
         if self._doGen:
             genNVtx = event.Generator_nVtx
 
-        pileup = self._lumiMu[(event['run'],event['lumi'])]
-        #print pileup
-        #if pileup >= 60 or pileup < 50:
-        #    return True
+
+        if not self._doGen:
+            if not self._passesLumiFilter(event.run, event.lumi):
+                return True
+            pileup = self._lumiMu[(event['run'],event['lumi'])]
+
+
+        offline, online = extractSums(
+            event, self._doEmu, self._doReco, self._doGen)
 
 
         for name in self._sumTypes:
@@ -447,11 +447,11 @@ class Analyzer(BaseAnalyzer):
 
                     for region in genFillRegions:
                         for suffix in ['_eff', '_res', '_2D', '_eff_HR', '_2D_HR']:
-                            if '_res' in suffix and (genL1EmuJetEt == 0 or leadingGenJet.etCorr < 30):
+                            if '_res' in suffix and (genL1EmuJetEt == 0 or leadingGenJet.et < 30):
                                 continue
                             name = 'genJetET_{0}_Emu{1}'.format(region, suffix)
                             getattr(self, name).fill(
-                                genNVtx, leadingGenJet.etCorr, genL1EmuJetEt,
+                                genNVtx, leadingGenJet.et, genL1EmuJetEt,
                             )
 
                 genL1Jet = match(leadingGenJet, event.l1Jets)
@@ -462,11 +462,11 @@ class Analyzer(BaseAnalyzer):
 
                 for region in genFillRegions:
                     for suffix in ['_eff', '_res', '_2D', '_eff_HR', '_2D_HR']:
-                        if '_res' in suffix and (genL1JetEt == 0 or leadingGenJet.etCorr < 30):
+                        if '_res' in suffix and (genL1JetEt == 0 or leadingGenJet.et < 30):
                             continue
                         name = 'genJetET_{0}{1}'.format(region, suffix)
                         getattr(self, name).fill(
-                            genNVtx, leadingGenJet.etCorr, genL1JetEt,
+                            genNVtx, leadingGenJet.et, genL1JetEt,
                         )
 
         if self._doReco:
