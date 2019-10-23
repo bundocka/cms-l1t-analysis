@@ -223,31 +223,31 @@ class Analyzer(BaseAnalyzer):
         cfgs = []
         if self._doReco:
             cfgs.extend([
-                Config("caloHT", "Offline Calo HT", "L1 HT", 30, 830),
+                Config("caloHT", "Offline Calo HT", "L1 #it{H}_{T}", 30, 830),
                 Config("pfHT", "Offline PF HT", "L1 HT", 30, 830),
                 Config("caloMETHF", "Offline Calo MET HF", "L1 MET HF", 0, 400),
                 Config("caloMETBE", "Offline Calo MET BE", "L1 MET BE", 0, 400),
                 Config("pfMET_NoMu", "Offline PF MET NoMu",
                        "L1 MET HF", 0, 400),
-                Config("caloJetET_BE", "Offline Central Calo Jet ET",
+                Config("caloJetET_BE", "Offline Central Calo Jet #it{p}_{T}",
                        "L1 Jet ET", 20, 420),
-                Config("caloJetET_HF", "Offline Forward Calo Jet ET",
+                Config("caloJetET_HF", "Offline Forward Calo Jet #it{p}_{T}",
                        "L1 Jet ET", 20, 420),
-                Config("pfJetET_BE", "Offline Central PF Jet ET",
+                Config("pfJetET_BE", "Offline Central PF Jet #it{p}_{T}",
                        "L1 Jet ET", 20, 420),
-                Config("pfJetET_HF", "Offline Forward PF Jet ET",
+                Config("pfJetET_HF", "Offline Forward PF Jet #it{p}_{T}",
                        "L1 Jet ET", 20, 420),
             ])
         if self._doGen:
             if not self._doPhase2:
                 cfgs.extend([
-                    Config("genHT", "Gen HT", "L1 HT", 30, 830),
+                    Config("genHT", "Gen HT", "L1 #it{H}_{T}", 30, 830),
                     Config("genMETHF", "Gen MET HF", "L1 MET HF", 0, 400),
                     Config("genMETBE", "Gen MET BE", "L1 MET BE", 0, 400)])
             cfgs.extend([
-                Config("genJetET_BE", "Central Gen Jet ET",
+                Config("genJetET_BE", "Central Gen Jet #it{p}_{T}",
                        "L1 Jet ET", 20, 420),
-                Config("genJetET_HF", "Forward Gen Jet ET",
+                Config("genJetET_HF", "Forward Gen Jet #it{p}_{T}",
                        "L1 Jet ET", 20, 420),
             ])
 
@@ -381,7 +381,7 @@ class Analyzer(BaseAnalyzer):
 
         if self._doReco or self._doVertex:
             recoNVtx = event.Vertex_nVtx
-        if self._doGen:
+        if self._doGen and not self._doPhase2:
             genNVtx = event.Generator_nVtx
 
 
@@ -390,9 +390,9 @@ class Analyzer(BaseAnalyzer):
                 return True
             pileup = self._lumiMu[(event['run'],event['lumi'])]
 
-
-        offline, online = extractSums(
-            event, self._doEmu, self._doReco, self._doGen)
+        if not self._doPhase2:
+            offline, online = extractSums(
+                event, self._doEmu, self._doReco, self._doGen)
 
 
         for name in self._sumTypes:
