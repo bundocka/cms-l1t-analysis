@@ -57,10 +57,9 @@ class Producer(BaseProducer):
             self._jetClass = None
 
     def produce(self, event):
-        bxCheck = 'recoTree' in self.params['load_trees']
         variables = [event[i] for i in self._inputs]
         jets = [self._jetClass(*args) for args in zip(*variables)]
-        if 'L1' in self._jetType and bxCheck:
+        if 'L1' in self._jetType:
             jets = [jet for jet in jets if jet.bx == 0]
         if self._jetFilter:
             jets = self._jetFilter(jets)
