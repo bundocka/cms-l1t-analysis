@@ -24,8 +24,8 @@ setattr(Efficiency, "__iadd__", my_iadd)
 
 
 class EfficiencyPlot(BasePlotter):
-    drawstyle = 'HIST'
-    drawstyle_data = 'P'
+    drawstyle = 'HISTC'
+    drawstyle_data = 'PC'
     markerstyle_overlay = 23
 
     def __init__(self, online_name, offline_name):

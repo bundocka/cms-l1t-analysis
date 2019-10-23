@@ -86,8 +86,8 @@ def __clean(hists):
             new = asrootpy(hist.CreateGraph("e0"))
             new.decorate(hist)
             hist = new
-            hist.SetMarkerSize(0.5)
-            hist.SetLineWidth(1)
+            hist.SetMarkerSize(1)
+            hist.SetLineWidth(5)
             gStyle.SetLineScalePS(1)
         else:
             gStyle.SetLineScalePS(3)
