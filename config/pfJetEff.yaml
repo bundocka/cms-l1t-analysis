@@ -5,8 +5,7 @@ input:
   ntuple_map_file: config/ntuple_content_mc.yaml
   files:
       # QCD MC
-       - 9x9.root
-       #- qcd.root
+       - qcd.root
   sample:
     name: MC
     title: TDR
@@ -57,9 +56,9 @@ analysis:
     goodGenJets:
       module: cmsl1t.producers.jets
       inputs:
-        - Generator_jetPt
-        - Generator_jetEta
-        - Generator_jetPhi
+        - L1GenJet_jetPt
+        - L1GenJet_jetEta
+        - L1GenJet_jetPhi
       jetType: Gen
       outputs:
         - goodGenJets
