@@ -3,10 +3,11 @@
 import os
 import requests
 
-# should we make this into a parameter
-CMSSW_BRANCH = 'l1t-integration-CMSSW_9_2_8'
-BASE_URL = 'https://raw.githubusercontent.com/cms-l1t-offline/cmssw/{0}/L1Trigger/L1TNtuples/interface/'.format(
-    CMSSW_BRANCH)
+# should we make this into a parameter 
+USER = 'bundocka'
+CMSSW_BRANCH = 'addHistPFJetTree'
+BASE_URL = 'https://raw.githubusercontent.com/{0}/cmssw/{1}/L1Trigger/L1TNtuples/interface/'.format(
+    USER, CMSSW_BRANCH)
 files_to_load = [
     'L1AnalysisBMTFInputsDataFormat.h',
     'L1AnalysisBMTFInputsDataFormat.h',
@@ -37,6 +38,7 @@ files_to_load = [
     'L1AnalysisL1ExtraDataFormat.h',
     'L1AnalysisRecoElectronDataFormat.h',
     'L1AnalysisRecoRpcHitDataFormat.h',
+    'L1AnalysisPhaseIPFJetDataFormat.h',
 ]
 DST = 'external/L1Trigger/L1TNtuples/interface'
 
