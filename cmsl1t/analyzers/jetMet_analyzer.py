@@ -45,8 +45,8 @@ ETA_RANGES = dict(
     HT="|\\eta| < 2.4",
     METBE="|\\eta| < 3.0",
     METHF="|\\eta| < 5.0, 50 \\leq PU < 60",
-    JetET_BE="|\\eta| < 3.0",
-    JetET_HF="3.0 < |\\eta| < 5.0",
+    JetET_BE="1.4 < |\\eta| < 2.4",
+    JetET_HF="2.4 < |\\eta| < 5.0",
 )
 
 ALL_THRESHOLDS = dict(
@@ -217,8 +217,8 @@ class Analyzer(BaseAnalyzer):
         cfgs = []
         if self._doReco:
             cfgs.extend([
-                Config("caloHT", "Offline Calo HT", "L1 HT", 30, 850),
-                Config("pfHT", "Offline PF HT", "L1 HT", 30, 850),
+                Config("caloHT", "Offline Calo HT", "L1 HT", 50, 1050),
+                Config("pfHT", "Offline PF HT", "L1 HT", 50, 1050),
                 Config("caloMETHF", "Offline Calo MET HF", "L1 MET HF", 0, 400),
                 Config("caloMETBE", "Offline Calo MET BE", "L1 MET BE", 0, 400),
                 Config("pfMET_NoMu", "Offline PF MET NoMu",
@@ -234,13 +234,13 @@ class Analyzer(BaseAnalyzer):
             ])
         if self._doGen:
             cfgs.extend([
-                Config("genHT", "Gen HT", "L1 HT", 30, 850),
+                Config("genHT", "Gen HT", "L1 HT", 50, 850),
                 #Config("genMETHF", "Gen MET HF", "L1 MET HF", 0, 400),
                 #Config("genMETBE", "Gen MET BE", "L1 MET BE", 0, 400),
                 Config("genJetET_BE", "Central Gen Jet ET",
-                       "L1 Jet ET", 20, 420),
+                       "L1 Jet ET", 20, 820),
                 Config("genJetET_HF", "Forward Gen Jet ET",
-                       "L1 Jet ET", 20, 420),
+                       "L1 Jet ET", 20, 820),
             ])
 
         self._plots_from_cfgs(cfgs, puBins)
@@ -435,9 +435,9 @@ class Analyzer(BaseAnalyzer):
             if leadingGenJet:
 
                 genFillRegions = []
-                if abs(leadingGenJet.eta) < 3.0:
+                if abs(leadingGenJet.eta) > 1.4 and abs(leadingGenJet.eta) < 2.4:
                     genFillRegions = ['BE']
-                elif abs(leadingGenJet.eta) < 5.0:
+                elif abs(leadingGenJet.eta) < 5.0:# and abs(leadingGenJet.eta) > 3.0:
                     genFillRegions = ['HF']
 
                 if self._doEmu:

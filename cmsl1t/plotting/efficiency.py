@@ -253,7 +253,7 @@ class EfficiencyPlot(BasePlotter):
             xmax = hists[0].GetTotalHistogram().GetBinLowEdge(hists[0].GetTotalHistogram().GetNbinsX() + 1)
 
             low = 20
-            high = 400
+            high = 820
             space = 20
             
             self.offline_title = 'Gen Jet #it{p}_{T} (GeV)'
@@ -261,7 +261,7 @@ class EfficiencyPlot(BasePlotter):
             # Draw each efficiency (with fit)
             if 'HT' in name:
                 low=50
-                high=850
+                high=1050
                 space=50
                 self.offline_title = 'Gen #it{H}_{T} (GeV)'
             
@@ -276,14 +276,17 @@ class EfficiencyPlot(BasePlotter):
             # Add labels
             label_canvas()
 
+            leftmarge=0.4
+            if 'HT' in name:
+                leftmarge=0.37
+
             # Add a legend
             legend = Legend(
                 len(hists),
-                header=self.legend_title + "       #bf{#it{QCD + TTbar}}",
-                topmargin=0.35,
-                rightmargin=0.31,
-                leftmargin=0.65,
-                textsize=0.025,
+                header=self.legend_title + "       #bf{#it{QCD + t#bar{t}}}",
+                topmargin=0.37,
+                leftmargin=leftmarge,
+                textsize=0.032,
                 entryheight=0.028,
             )
 

@@ -104,9 +104,9 @@ class Analyzer(BaseAnalyzer):
 
             rates_plot = getattr(self, name + "_rates")
             if 'HT' in name:
-                rates_plot.build("L1 " + name, puBins, 40, 40, 440, ETA_RANGES.get(name))
+                rates_plot.build("L1 " + name, puBins, 80, 40, 440, ETA_RANGES.get(name))
             else:
-                rates_plot.build("L1 " + name, puBins, 30, 00, 300, ETA_RANGES.get(name))
+                rates_plot.build("L1 " + name, puBins, 60, 00, 300, ETA_RANGES.get(name))
 
             rate_vs_pileup_plot = getattr(self, name + "_rate_vs_pileup")
             rate_vs_pileup_plot.build("L1 " + name, trig_thresholds, 18, 20, 56, ETA_RANGES.get(name))

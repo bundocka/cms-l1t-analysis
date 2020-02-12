@@ -80,7 +80,7 @@ class RatesPlot(BasePlotter):
         hist = self.plots.get_bin_contents([bn.Base.everything])
         hist = cumulative_hist(hist)
 
-        hist.drawstyle = "histC"#"EP"
+        hist.drawstyle = "EP"
 #        hist.SetMarkerSize(0.5)
         hist.SetMarkerColor(3)
         hist.SetLineWidth(3)
@@ -89,12 +89,12 @@ class RatesPlot(BasePlotter):
         #    fit = self.fits.get_bin_contents([threshold])
         #    fits.append(fit)
         hists.append(hist)
-        labels.append("9x9 Hist PF Jet")
+        labels.append("7x7 Hist PF Jet")
 
         emu_hist = emu_plotter.plots.get_bin_contents([bn.Base.everything])
         emu_hist = cumulative_hist(emu_hist)
 
-        emu_hist.drawstyle = "histC"#"EP"
+        emu_hist.drawstyle = "EP"
 #        emu_hist.SetMarkerSize(0.5)
         emu_hist.SetMarkerColor(4)
         emu_hist.SetLineWidth(3)
@@ -139,12 +139,12 @@ class RatesPlot(BasePlotter):
                 header=head,
                 topmargin=0.25,
                 leftmargin=0.5,
-                textsize=0.03,
+                textsize=0.035,
                 entryheight=0.028
             )
             for hist, label in zip(hists, labels):
                 hist = normalise_to_collision_rate(hist)
-                legend.AddEntry(hist, label)
+                legend.AddEntry(hist, label, "L")
             legend.SetBorderSize(0)
             legend.Draw()
 

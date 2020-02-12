@@ -4,7 +4,7 @@ name: 'Jet Met Rates'
 input:
   files:
       # Zero Bias
-        -  9x9SNu.root
+        -  7x7prSNu.root
   sample:
     name: MC
     title: TDR
@@ -69,3 +69,4 @@ output:
   template:
      - output/zb_rates
      - "{date}_{run_number}_{sample_name}_{trigger_name}"
+  format: root

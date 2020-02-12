@@ -120,7 +120,6 @@ def __apply_colour_map(hists, colourmap, colour_values, change_colour):
             if "marker" in change_colour:
                 hist.markercolor = colour
 
-
 def draw(hists, colourmap="RainBow", colour_values=None,
          change_colour=("line", "marker"), canvas_args={}, draw_args={}):
     """
@@ -145,6 +144,7 @@ def draw(hists, colourmap="RainBow", colour_values=None,
     xaxis = axis_hist.axis(0)
     yaxis = axis_hist.axis(1)
     axis_hist.title = ""
+    
 
     canvas.SetGridx()
     canvas.Update()
@@ -184,8 +184,11 @@ def label_canvas(sample_title=None, run=None, isData=False):
         cms += sample_title
     latex.DrawLatex(0.1, 0.92, cms)
 
-    run_summary = "#scale[0.8]{14 TeV   3000 fb^{-1}   200 PU}"
+    run_summary = "#scale[0.8]{14 TeV   200 PU}"
     if run:
         run_summary += run
     latex.SetTextAlign(31)
     latex.DrawLatex(0.9, 0.92, run_summary)
+
+    lumi = "#scale[0.7]{Inst. lumi = 7\\times10^{34}cm^{2}s^{-1}}"
+    latex.DrawLatex(0.85, 0.75, lumi)

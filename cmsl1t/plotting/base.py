@@ -25,6 +25,7 @@ class BasePlotter(object):
         return "{}/{}.{}".format(self.output_dir, name, self.output_format)
 
     def save_canvas(self, canvas=None, name=None):
+        gPad.SetTicks(1,1)
         if not canvas:
             canvas = gPad.func()
         if not name:
