@@ -104,6 +104,35 @@ class RatesPlot(BasePlotter):
         hists.append(emu_hist)
         labels.append("Emu")
 
+        if 'JetET_BE' in self.online_title:
+            thresholds = [35, 90, 120, 180]
+            rates = [30618, 4476, 450, 23]
+            #for thresh in thresholds:
+            #    print("JetBE rate at " + str(thresh) + " = " + str(emu_hist.get_bin_content(thresh)))
+            for thresh, rate in zip(thresholds, rates):
+                diff = 9999999999
+                newThresh = 0
+                for binC in range(0,400):
+                    if abs(emu_hist.get_bin_content(binC) - rate) < diff:
+                        newThresh = binC
+                        diff = abs(emu_hist.get_bin_content(binC) - rate)
+                print("JetBE " + str(thresh) + " now at " + str(newThresh))
+
+        if 'METHF' in self.online_title:
+            thresholds = [80, 100, 120]
+            rates = [10358, 5837, 3224]
+            #for thresh in thresholds:
+            #    print("METHF rate at " + str(thresh) + " = " + str(emu_hist.get_bin_content(thresh)))
+            for thresh, rate in zip(thresholds, rates):
+                diff = 9999999999
+                newThresh = 0
+                for binC in range(0,400):
+                    if abs(emu_hist.get_bin_content(binC) - rate) < diff:
+                        newThresh = binC
+                        diff = abs(emu_hist.get_bin_content(binC) - rate)
+                print("METHF " + str(thresh) + " now at " + str(newThresh))
+
+
         self.__make_overlay(hists, fits, labels, "Rate (kHz)", setlogy=True)
 
     def __make_overlay(self, hists, fits, labels, ytitle, suffix="", setlogy=False):
