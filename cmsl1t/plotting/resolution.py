@@ -21,6 +21,7 @@ class ResolutionPlot(BasePlotter):
         self.online_name = online_name
         self.offline_name = offline_name
         self.resolution_method = get_resolution_function(resolution_type)
+        self.comparisons = []
 
     def create_histograms(self,
                           online_title, offline_title,
@@ -69,8 +70,6 @@ class ResolutionPlot(BasePlotter):
                         self.pileup_bins.get_bin_lower(pile_up))
             else:
                 continue
-            hist.SetMarkerSize(0.5)
-            hist.SetLineWidth(1)
             hists.append(hist)
             labels.append(label)
             # if with_fits:
@@ -82,33 +81,39 @@ class ResolutionPlot(BasePlotter):
             hist.GetYaxis().SetRangeUser(-0.1, 1.1)
         self.__make_overlay(normed_hists, fits, labels, "a.u.")
 
-    def overlay_with_emu(self, emu_plotter, with_fits=False):
+    def overlay(self, other_plotters=None, with_fits=False):
         hists = []
         labels = []
         fits = []
+        suffix = '__emu_overlay' if other_plotters else '__comparison'
+        # If no other plotters provided, use comparison plotters
+        if other_plotters is None:
+            other_plotters = self.comparisons
+            titles = self.comp_titles
+        else:
+            titles = ['Hw', 'Emu']
+
         for (pile_up, ), hist in self.plots.flat_items_all():
             if pile_up == bn.Base.everything:
                 hist.SetLineStyle(1)
                 hist.drawstyle = ResolutionPlot.drawstyle
-                label = "HW, all PU"
+                label = 'L1 ' + titles[0]
             else:
                 continue
-            hist.SetMarkerSize(0.5)
-            hist.SetLineWidth(1)
             hists.append(hist)
             labels.append(label)
 
-        for (pile_up, ), hist in emu_plotter.plots.flat_items_all():
-            if pile_up == bn.Base.everything:
-                hist.SetLineStyle(1)
-                hist.drawstyle = ResolutionPlot.drawstyle
-                label = "Emu, all PU"
-            else:
-                continue
-            hist.SetMarkerSize(0.5)
-            hist.SetLineWidth(1)
-            hists.append(hist)
-            labels.append(label)
+        for other_plotter in other_plotters:
+            for (pile_up, ), hist in other_plotter.plots.flat_items_all():
+                if pile_up == bn.Base.everything:
+                    hist.SetLineStyle(1)
+                    hist.drawstyle = ResolutionPlot.drawstyle
+                    label = 'L1 ' + titles[other_plotters.index(other_plotter)+1]
+                else:
+                    continue
+                hist.markerstyle = 21 + other_plotters.index(other_plotter)
+                hists.append(hist)
+                labels.append(label)
 
         # self.__make_overlay(hists, fits, labels,
         #                    "Number of events", "__Overlay_Emu")
@@ -117,7 +122,7 @@ class ResolutionPlot(BasePlotter):
         for hist in normed_hists:
             hist.GetYaxis().SetRangeUser(-0.1, 1.1)
         self.__make_overlay(normed_hists, fits, labels,
-                            "a.u.", "__Overlay_Emu")
+                            "a.u.", suffix)
 
     def __make_overlay(self, hists, fits, labels, ytitle, suffix=""):
         with preserve_current_style():
@@ -179,3 +184,10 @@ class ResolutionPlot(BasePlotter):
         """
         self.plots += other.plots
         return self.plots
+
+    def _add(self, other):
+        """
+        Add another plotter for multiple dataset comparison
+        """
+        self.comparisons.append(other)
+        return self.comparisons

@@ -22,6 +22,8 @@ class ResolutionVsXPlot(BasePlotter):
         self.offline_name = offline_name
         self.versus_name = versus_name
         self.resolution_method = get_resolution_function(resolution_type)
+        self.comparisons = []
+
 
     def create_histograms(
             self, online_title, offline_title, versus_title, pileup_bins,
@@ -130,3 +132,10 @@ class ResolutionVsXPlot(BasePlotter):
         """
         self.plots += other.plots
         return self.plots
+
+    def _add(self, other):
+        """
+        Add another plotter for multiple dataset comparison
+        """
+        self.comparisons.append(other.plots)
+        return self.comparisons

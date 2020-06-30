@@ -20,6 +20,7 @@ class RatesPlot(BasePlotter):
         name = ["rates", online_name]
         super(RatesPlot, self).__init__("__".join(name))
         self.online_name = online_name
+        self.comparisons = []
 
     def create_histograms(self,
                           online_title,
@@ -59,7 +60,6 @@ class RatesPlot(BasePlotter):
                     self.pileup_bins.get_bin_center(pile_up))
             else:
                 continue
-            h.SetMarkerSize(0.5)
             hists.append(h)
             labels.append(label)
             # if with_fits:
@@ -70,41 +70,48 @@ class RatesPlot(BasePlotter):
         self.__make_overlay(normed_hists, fits, labels,
                             "Fraction of events", "__shapes")
 
-    def overlay_with_emu(self, emu_plotter, with_fits=False):
+    def overlay(self, other_plotters=None, with_fits=False):
 
         hists = []
         labels = []
         fits = []
+        print self.comp_titles
+        suffix = '__emu_overlay' if other_plotters else '__comparison'
+        # If no other plotters provided, use comparison plotters
+        if other_plotters is None:
+            other_plotters = self.comparisons
+            titles = self.comp_titles
+        else:
+            titles = ['Hw', 'Emu']
 
         hist = self.plots.get_bin_contents([bn.Base.everything])
         hist = cumulative_hist(hist)
         hist = normalise_to_collision_rate(hist)
-
         hist.drawstyle = "HIST"
-        hist.SetMarkerSize(0.5)
         hist.SetLineWidth(3)
         hist.SetMarkerColor(1)
         # if with_fits:
         #    fit = self.fits.get_bin_contents([threshold])
         #    fits.append(fit)
         hists.append(hist)
-        labels.append("Hw")
+        labels.append('L1 ' + titles[0])
 
-        emu_hist = emu_plotter.plots.get_bin_contents([bn.Base.everything])
-        emu_hist = cumulative_hist(emu_hist)
-        emu_hist = normalise_to_collision_rate(emu_hist)
+        for other_plotter in other_plotters:
+            hist = other_plotter.plots.get_bin_contents([bn.Base.everything])
+            hist = cumulative_hist(hist)
+            hist = normalise_to_collision_rate(hist)
 
-        emu_hist.drawstyle = "HIST"
-        emu_hist.SetMarkerSize(0.5)
-        emu_hist.SetLineWidth(3)
-        emu_hist.SetMarkerColor(2)
-        # if with_fits:
-        #    emu_fit = self.fits.get_bin_contents([threshold])
-        #    fits.append(emu_fit)
-        hists.append(emu_hist)
-        labels.append("Emu")
+            hist.drawstyle = "HIST"
+            hist.SetLineWidth(3)
+            hist.SetMarkerColor(2)
+            hist.markerstyle = 21 + other_plotters.index(other_plotter)
+            # if with_fits:
+            #    fit = self.fits.get_bin_contents([threshold])
+            #    fits.append(fit)
+            hists.append(hist)
+            labels.append('L1 ' + titles[other_plotters.index(other_plotter)+1])
 
-        self.__make_overlay(hists, fits, labels, "Rate (kHz)", setlogy=True)
+        self.__make_overlay(hists, fits, labels, "Rate (kHz)", suffix, setlogy=True)
 
     def __make_overlay(self, hists, fits, labels, ytitle, suffix="", setlogy=False):
         with preserve_current_style():
@@ -161,6 +168,13 @@ class RatesPlot(BasePlotter):
         """
         self.plots += other.plots
         return self.plots
+
+    def _add(self, other):
+        """
+        Add another plotter for multiple dataset comparison
+        """
+        self.comparisons.append(other)
+        return self.comparisons
 
     def get_stats(self, summary_bins=[], summary_label=''):
         summary_columns = list(self._summary_columns(summary_bins, summary_label))

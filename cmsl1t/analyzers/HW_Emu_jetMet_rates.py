@@ -145,8 +145,8 @@ class Analyzer(BaseAnalyzer):
         if not self._doGen:
             if not self._passesLumiFilter(event['run'], event['lumi']):
                 return True
-        if (event['run'], event['lumi']) in self._lumiMu:
-            pileup = self._lumiMu[(event['run'], event['lumi'])]
+            if (event['run'], event['lumi']) in self._lumiMu:
+                pileup = self._lumiMu[(event['run'], event['lumi'])]
 
         # Sums:
         if not self._doPhase2:
@@ -262,11 +262,16 @@ class Analyzer(BaseAnalyzer):
                 continue
             plotter = getattr(self, histo_name + '_rates')
             emu_plotter = getattr(self, histo_name + '_Emu_rates')
-            plotter.overlay_with_emu(emu_plotter)
+            plotter.overlay([emu_plotter])
+            # compare multiple files if they are provided
+            if self._doComp:
+                plotter.overlay()
 
             plotter = getattr(self, histo_name + '_rate_vs_pileup')
             emu_plotter = getattr(self, histo_name + "_Emu" + '_rate_vs_pileup')
-            plotter.overlay_with_emu(emu_plotter)
+            plotter.overlay([emu_plotter])
+            if self._doComp:
+                plotter.overlay()
 
         # calculate cumulative histograms
         for plot in self.all_plots:

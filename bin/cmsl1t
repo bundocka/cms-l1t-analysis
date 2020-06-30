@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 from __future__ import print_function
 import ROOT
-import os
+import os, sys
 from datetime import datetime
 from cmsl1t.utils.timers import timerfunc_log_to
 from cmsl1t.config import ConfigParser
@@ -72,11 +72,15 @@ def process_tuples(config, nevents, analyzers, producers):
 
 
 @timerfunc_log_to(logger.info)
-def process_histogram_files(config, analyzers):
+def process_histogram_files(config, analyzers, do_comparison):
     # Open the histogram files
     logger.info(section.format("Reading back histograms"))
 
-    inputs = config.get('input', 'hist_files')
+    if do_comparison:
+        inputs = config.get('input', 'comp_files')
+    else:
+        inputs = config.get('input', 'hist_files')
+
     logger.info("Inputs:")
     if len(inputs) > 10:
         msg = inputs[:10], "... and " + str(len(inputs) - 10) + " more"
@@ -91,7 +95,8 @@ def process_histogram_files(config, analyzers):
             if analyzer not in results:
                 results[analyzer] = True
             if analyzer.might_contain_histograms(filename):
-                results[analyzer] &= bool(analyzer.reload_histograms(filename))
+                results[analyzer] &= bool(analyzer.reload_histograms(filename, do_comparison))
+
 
     # Check for errors
     return check(results.values(), results.keys(), 'process_histogram_files')
@@ -110,7 +115,7 @@ def process_legacy(config, nevents, analyzers):
     return all(results)
 
 
-def run(config, nevents, reload_histograms):
+def run(config, nevents, reload_histograms, do_comparison):
     results = [False]
     # Fetch the analyzer
     analyzers = config.get('analysis', 'analyzers')
@@ -128,7 +133,7 @@ def run(config, nevents, reload_histograms):
         else:
             process_tuples(config, nevents, analyzers, producers)
     else:
-        process_histogram_files(config, analyzers)
+        process_histogram_files(config, analyzers, do_comparison)
 
     # Write out the histograms
     for analyzer in analyzers:
@@ -176,13 +181,20 @@ def check(results, analyzers, method):
               help="Reload histograms from a file and skip the input tuples")
 @click.option('--hist-files', default=None,
               help="Provide a list of files to reload histograms from")
+@click.option('--comp-files', default=None,
+              help="Provide two sets of L1Ntuples for comparison of data, with input format: --comp-files <title1>:<file1>,<title2>:<file2>,<title3>:<file3>),...")
 @click_log.simple_verbosity_option(logger)
-def analyze(config_file, nevents, reload_histograms, hist_files):
+def analyze(config_file, nevents, reload_histograms, hist_files, comp_files):
     logger.info(section.format("Starting CMS L1T Analysis"))
+    if(hist_files and comp_files):
+        logger.error("Please choose either --hist-files or --comp_files option. Exiting...")
+        sys.exit(-1)
+    reload_histograms = True if comp_files else reload_histograms
     config = ConfigParser()
-    config.read(config_file, reload_histograms, hist_files)
+    config.read(config_file, reload_histograms, hist_files, comp_files)
+    do_comparison = comp_files is not None
 
-    isok = run(config, nevents, reload_histograms)
+    isok = run(config, nevents, reload_histograms, do_comparison)
 
     print('\n' + separator + '\n')
     if isok is not True:

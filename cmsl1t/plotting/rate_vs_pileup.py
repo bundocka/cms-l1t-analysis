@@ -17,6 +17,7 @@ class RateVsPileupPlot(BasePlotter):
         name = ["rate_vs_pileup", online_name]
         super(RateVsPileupPlot, self).__init__("__".join(name))
         self.online_name = online_name
+        self.comparisons = []
 
     def create_histograms(self,
                           online_title,
@@ -57,7 +58,6 @@ class RateVsPileupPlot(BasePlotter):
             )
             hist.Divide(self.plots.get_bin_contents([bn.Base.everything]))
             hist.drawstyle = "EP"
-            hist.SetMarkerSize(0.5)
             hist.SetMarkerColor(2)
             # if with_fits:
             #    fit = self.fits.get_bin_contents([threshold])
@@ -68,25 +68,30 @@ class RateVsPileupPlot(BasePlotter):
 
             self.__make_overlay(hists, fits, labels, thresholds)
 
-    def overlay_with_emu(self, emu_plotter, with_fits=False):
+    def overlay(self, other_plotters=None, with_fits=False):
 
         hists = []
         labels = []
         fits = []
         thresholds = []
+        suffix = '__emu_overlay' if other_plotters else '__comparison'
+        if other_plotters is None:
+            other_plotters = self.comparisons
+            titles = self.comp_titles
+        else:
+            titles = ['Hw', 'Emu']
 
         for (threshold, ), hist in self.plots.flat_items_all():
             if not isinstance(threshold, int):
                 continue
             label_template = '{online_title} > {threshold} GeV'
             label = label_template.format(
-                online_title='L1 MET HF PUS On',
+                online_title='L1 ' + titles[0],
                 threshold=self.thresholds.bins[threshold],
             )
             hist.Divide(self.plots.get_bin_contents([bn.Base.everything]))
             hist.Scale(2855)
             hist.drawstyle = "EP"
-            hist.SetMarkerSize(0.5)
             hist.SetMarkerColor(1)
             # if with_fits:
             #    fit = self.fits.get_bin_contents([threshold])
@@ -94,26 +99,28 @@ class RateVsPileupPlot(BasePlotter):
             hists.append(hist)
             labels.append(label)
             thresholds.append(threshold)
-            for (emu_threshold, ), emu_hist in emu_plotter.plots.flat_items_all():
-                if emu_threshold == threshold:
+        for other_plotter in other_plotters:
+            for (threshold, ), hist in other_plotter.plots.flat_items_all():
+                    if not isinstance(threshold, int):
+                        continue
                     label_template = '{online_title} > {threshold} GeV'
-                    emu_label = label_template.format(
-                        online_title='L1 MET HF PUS Off',
-                        threshold=emu_plotter.thresholds.bins[threshold],
+                    label = label_template.format(
+                        online_title='L1 ' + titles[other_plotters.index(other_plotter)+1],
+                        threshold=other_plotter.thresholds.bins[threshold],
                     )
-                    emu_hist.Divide(emu_plotter.plots.get_bin_contents([bn.Base.everything]))
-                    emu_hist.Scale(2855)
-                    emu_hist.drawstyle = "EP"
-                    emu_hist.SetMarkerSize(0.5)
-                    emu_hist.SetMarkerColor(2)
+                    hist.Divide(other_plotter.plots.get_bin_contents([bn.Base.everything]))
+                    hist.Scale(2855)
+                    hist.drawstyle = "EP"
+                    hist.SetMarkerColor(2)
+                    hist.markerstyle = 21 + other_plotters.index(other_plotter)
                     # if with_fits:
-                    #    emu_fit = self.fits.get_bin_contents([threshold])
-                    #    fits.append(emu_fit)
-                    hists.append(emu_hist)
-                    labels.append(emu_label)
-                    thresholds.append(emu_threshold)
+                    #    fit = self.fits.get_bin_contents([threshold])
+                    #    fits.append(fit)
+                    hists.append(hist)
+                    labels.append(label)
+                    thresholds.append(threshold)
 
-        self.__make_overlay(hists, fits, labels, thresholds)
+        self.__make_overlay(hists, fits, labels, thresholds, suffix)
 
     def __make_overlay(self, hists, fits, labels, thresholds, suffix=""):
         with preserve_current_style():
@@ -164,6 +171,13 @@ class RateVsPileupPlot(BasePlotter):
         """
         self.plots += other.plots
         return self.plots
+
+    def _add(self, other):
+        """
+        Add another plotter for multiple dataset comparison
+        """
+        self.comparisons.append(other)
+        return self.comparisons
 
     def get_stats(self, summary_bins=[], summary_label=''):
         summary_columns = list(self._summary_columns(summary_bins, summary_label))

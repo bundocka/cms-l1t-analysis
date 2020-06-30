@@ -106,3 +106,11 @@ class OnlineVsOffline(BasePlotter):
         """
         self.plots += other.plots
         return self.plots
+
+    def _add(self, other):
+        """
+        Add another plotter for multiple dataset comparison
+        This doesn't make sense for online vs offline so just
+        return 1st file plots
+        """
+        return self.plots

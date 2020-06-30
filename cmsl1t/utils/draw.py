@@ -82,12 +82,12 @@ def __prepare_canvas(canvas_args):
 def __clean(hists):
     cleaned_hists = []
     for hist in hists:
+        hist.SetMarkerSize(0.7)
+        hist.SetLineWidth(2)
         if isinstance(hist, Efficiency):
             new = asrootpy(hist.CreateGraph("e0"))
             new.decorate(hist)
             hist = new
-            hist.SetMarkerSize(1)
-            hist.SetLineWidth(3)
             gStyle.SetLineScalePS(1)
         else:
             gStyle.SetLineScalePS(3)

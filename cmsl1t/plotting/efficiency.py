@@ -26,13 +26,13 @@ setattr(Efficiency, "__iadd__", my_iadd)
 class EfficiencyPlot(BasePlotter):
     drawstyle = 'HISTC'
     drawstyle_data = 'PC'
-    markerstyle_overlay = 23
 
     def __init__(self, online_name, offline_name):
         name = ["efficiency", online_name, offline_name]
         super(EfficiencyPlot, self).__init__("__".join(name))
         self.online_name = online_name
         self.offline_name = offline_name
+        self.comparisons = []
 
     def create_histograms(
             self, online_title, offline_title, pileup_bins, thresholds,
@@ -142,7 +142,17 @@ class EfficiencyPlot(BasePlotter):
         if with_fits:
             self.__summarize_fits()
 
-    def overlay_with_emu(self, emu_plotter, with_fits=False):
+    def overlay(self, other_plotters=None, with_fits=False):
+
+        suffix = 'emu_overlay' if other_plotters else 'comparison'
+
+        # If no other plotters provided, use comparison plotters
+        if other_plotters is None:
+            other_plotters = self.comparisons
+            titles = self.comp_titles
+        else:
+            titles = ['Hw', 'Emu']
+
         # Fit the efficiencies if requested
         if with_fits:
             self.__fit_efficiencies()
@@ -150,8 +160,7 @@ class EfficiencyPlot(BasePlotter):
         # Overlay the "all" pile-up bin for each threshold
         all_pileup_effs = self.efficiencies.get_bin_contents(
             [bn.Base.everything])
-        emu_pileup_effs = emu_plotter.efficiencies.get_bin_contents(
-            [bn.Base.everything])
+
         hists = []
         labels = []
         fits = []
@@ -166,7 +175,7 @@ class EfficiencyPlot(BasePlotter):
             hists.append(hist)
 
             label = label_template.format(
-                online_title='L1 Hw',
+                online_title='L1 ' + titles[0],
                 threshold=self.thresholds.bins[threshold],
             )
             labels.append(label)
@@ -174,26 +183,29 @@ class EfficiencyPlot(BasePlotter):
                 fits.append(self.fits.get_bin_contents(
                     [bn.Base.everything, threshold]))
 
-        for threshold in emu_pileup_effs.iter_all():
-            if not isinstance(threshold, int):
-                continue
-            hist = emu_pileup_effs.get_bin_contents(threshold)
-            hist.drawstyle = EfficiencyPlot.drawstyle_data
-            hist.markerstyle = EfficiencyPlot.markerstyle_overlay
-            self._dynamic_bin(hist)
-            hists.append(hist)
+        for other_plotter in other_plotters:
+            pileup_effs = other_plotter.efficiencies.get_bin_contents(
+                [bn.Base.everything])
+            for threshold in pileup_effs.iter_all():
+                if not isinstance(threshold, int):
+                    continue
+                hist = pileup_effs.get_bin_contents(threshold)
+                hist.drawstyle = EfficiencyPlot.drawstyle_data
+                hist.markerstyle = 21 + other_plotters.index(other_plotter)
+                self._dynamic_bin(hist)
+                hists.append(hist)
 
-            label = label_template.format(
-                online_title='L1 Emu',
-                threshold=emu_plotter.thresholds.bins[threshold],
-            )
-            labels.append(label)
-            if with_fits:
-                fits.append(emu_plotter.fits.get_bin_contents(
-                    [bn.Base.everything, threshold]))
+                label = label_template.format(
+                    online_title='L1 ' + titles[other_plotters.index(other_plotter)+1],
+                    threshold=other_plotter.thresholds.bins[threshold],
+                )
+                labels.append(label)
+                if with_fits:
+                    fits.append(other_plotter.fits.get_bin_contents(
+                        [bn.Base.everything, threshold]))
 
         self.__make_overlay(
-            "all", "all_overlay_with_Emu", hists, fits, labels, self.online_title,
+            "all", suffix, hists, fits, labels, self.online_title,
         )
 
         '''
@@ -265,8 +277,8 @@ class EfficiencyPlot(BasePlotter):
             legend = Legend(
                 len(hists),
                 header=self.legend_title,
-                topmargin=0.35,
-                rightmargin=0.31,
+                topmargin=0.15,
+                rightmargin=0.25,
                 leftmargin=0.69,
                 textsize=0.025,
                 entryheight=0.028,
@@ -314,6 +326,13 @@ class EfficiencyPlot(BasePlotter):
         """
         self.efficiencies += other.efficiencies
         return self.efficiencies
+
+    def _add(self, other):
+        """
+        Add another plotter for multiple dataset comparison
+        """
+        self.comparisons.append(other)
+        return self.comparisons
 
     def _dynamic_bin(self, eff):
         """
