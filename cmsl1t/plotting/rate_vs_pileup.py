@@ -101,24 +101,24 @@ class RateVsPileupPlot(BasePlotter):
             thresholds.append(threshold)
         for other_plotter in other_plotters:
             for (threshold, ), hist in other_plotter.plots.flat_items_all():
-                    if not isinstance(threshold, int):
-                        continue
-                    label_template = '{online_title} > {threshold} GeV'
-                    label = label_template.format(
-                        online_title='L1 ' + titles[other_plotters.index(other_plotter)+1],
-                        threshold=other_plotter.thresholds.bins[threshold],
-                    )
-                    hist.Divide(other_plotter.plots.get_bin_contents([bn.Base.everything]))
-                    hist.Scale(2855)
-                    hist.drawstyle = "EP"
-                    hist.SetMarkerColor(2)
-                    hist.markerstyle = 21 + other_plotters.index(other_plotter)
-                    # if with_fits:
-                    #    fit = self.fits.get_bin_contents([threshold])
-                    #    fits.append(fit)
-                    hists.append(hist)
-                    labels.append(label)
-                    thresholds.append(threshold)
+                if not isinstance(threshold, int):
+                    continue
+                label_template = '{online_title} > {threshold} GeV'
+                label = label_template.format(
+                    online_title='L1 ' + titles[other_plotters.index(other_plotter) + 1],
+                    threshold=other_plotter.thresholds.bins[threshold],
+                )
+                hist.Divide(other_plotter.plots.get_bin_contents([bn.Base.everything]))
+                hist.Scale(2855)
+                hist.drawstyle = "EP"
+                hist.SetMarkerColor(2)
+                hist.markerstyle = 21 + other_plotters.index(other_plotter)
+                # if with_fits:
+                #    fit = self.fits.get_bin_contents([threshold])
+                #    fits.append(fit)
+                hists.append(hist)
+                labels.append(label)
+                thresholds.append(threshold)
 
         self.__make_overlay(hists, fits, labels, thresholds, suffix)
 

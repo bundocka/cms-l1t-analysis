@@ -109,7 +109,7 @@ class RatesPlot(BasePlotter):
             #    fit = self.fits.get_bin_contents([threshold])
             #    fits.append(fit)
             hists.append(hist)
-            labels.append('L1 ' + titles[other_plotters.index(other_plotter)+1])
+            labels.append('L1 ' + titles[other_plotters.index(other_plotter) + 1])
 
         self.__make_overlay(hists, fits, labels, "Rate (kHz)", suffix, setlogy=True)
 

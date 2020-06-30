@@ -24,7 +24,6 @@ class ResolutionVsXPlot(BasePlotter):
         self.resolution_method = get_resolution_function(resolution_type)
         self.comparisons = []
 
-
     def create_histograms(
             self, online_title, offline_title, versus_title, pileup_bins,
             res_n_bins, res_low, res_high, vs_n_bins, vs_low, vs_high):

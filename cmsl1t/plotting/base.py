@@ -83,7 +83,7 @@ class BasePlotter(object):
 
         # Have not yet been initialised so need copy over values
         if comp_title:
-                self.comp_titles.append(comp_title)
+            self.comp_titles.append(comp_title)
         final = reloaded.__dict__
         final.update(self.__dict__)
         self.__dict__ = final

@@ -108,7 +108,7 @@ class ResolutionPlot(BasePlotter):
                 if pile_up == bn.Base.everything:
                     hist.SetLineStyle(1)
                     hist.drawstyle = ResolutionPlot.drawstyle
-                    label = 'L1 ' + titles[other_plotters.index(other_plotter)+1]
+                    label = 'L1 ' + titles[other_plotters.index(other_plotter) + 1]
                 else:
                     continue
                 hist.markerstyle = 21 + other_plotters.index(other_plotter)

@@ -196,7 +196,7 @@ class EfficiencyPlot(BasePlotter):
                 hists.append(hist)
 
                 label = label_template.format(
-                    online_title='L1 ' + titles[other_plotters.index(other_plotter)+1],
+                    online_title='L1 ' + titles[other_plotters.index(other_plotter) + 1],
                     threshold=other_plotter.thresholds.bins[threshold],
                 )
                 labels.append(label)

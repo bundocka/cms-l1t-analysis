@@ -575,13 +575,15 @@ class Analyzer(BaseAnalyzer):
 
         if self._doReco:
 
-            plot_names = ['caloHT', 'pfHT', 'caloMETBE', 'caloMETHF',
-                        'pfMET_NoMu', 'caloJetET_BE', 'caloJetET_HF',
-                        'pfJetET_BE', 'pfJetET_HF']
+            plot_names = [
+                'caloHT', 'pfHT', 'caloMETBE', 'caloMETHF',
+                'pfMET_NoMu', 'caloJetET_BE', 'caloJetET_HF',
+                'pfJetET_BE', 'pfJetET_HF'
+            ]
 
         if self._doGen:
 
-            plot_names = ['genJetET_BE', 'genJetET_HF']#, 'genHT', 'genMETBE', 'genMETHF']
+            plot_names = ['genJetET_BE', 'genJetET_HF']  # , 'genHT', 'genMETBE', 'genMETHF']
 
         for plot_name in plot_names:
             getattr(self, plot_name + '_eff').draw()
