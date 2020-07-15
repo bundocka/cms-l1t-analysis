@@ -180,6 +180,31 @@ class GreaterThan(Base):
         return self.bins[bin_index]
 
 
+class LessThan(Base):
+    """
+    Implements overlapping bins, defined by a list of lower bin edges.
+    For a given key the returned bin must be defined by a lower-edge that is
+    less than the key
+    """
+
+    def __init__(self, bins, label, use_everything_bin=False):
+        Base.__init__(self, len(bins), label,
+                      use_everything_bin=use_everything_bin)
+        self.bins = bins
+
+    def find_bins(self, key):
+        contained_in = []
+        for i, threshold in enumerate(self.bins):
+            if key <= threshold:
+                contained_in.append(i)
+        if len(contained_in) == 0:
+            contained_in = [self.underflow]
+        return contained_in
+
+    def _bin_center(self, bin_index):
+        return self.bins[bin_index]
+
+
 class Overlapped(Base):
     """
     Implements arbitrarily overlapping bins

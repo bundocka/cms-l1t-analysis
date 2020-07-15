@@ -73,6 +73,7 @@ class BaseAnalyzer(object):
              If comparing multiple files, legend title "comp_title" is
              provided with the filename, and passed to from_root
          """
+        comp_title = None
         results = []
         if do_comparison:
             self._doComp = True

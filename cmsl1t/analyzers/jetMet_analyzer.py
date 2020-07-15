@@ -1,6 +1,7 @@
 import os
 from cmsl1t.analyzers.BaseAnalyzer import BaseAnalyzer
 from cmsl1t.plotting.efficiency import EfficiencyPlot
+from cmsl1t.plotting.eff_vs_thresh import EffVsThreshPlot
 from cmsl1t.collections import EfficiencyCollection
 from cmsl1t.plotting.onlineVsOffline import OnlineVsOffline
 from cmsl1t.plotting.resolution import ResolutionPlot
@@ -55,6 +56,13 @@ ALL_THRESHOLDS = dict(
     METBE=[80, 100, 120],
     METHF=[80, 100, 120],
     JetET=[35, 90, 120]
+)
+
+ALL_OFF_THRESHOLDS = dict(
+    HT=[450],
+    METBE=[200],
+    METHF=[180],
+    JetET=[180]
 )
 
 
@@ -154,12 +162,15 @@ class Analyzer(BaseAnalyzer):
 
         for name in self._sumTypes:
             eff_plot = EfficiencyPlot("L1", "offline_" + name)
+            eff_vs_thresh = EffVsThreshPlot("L1", "offline_" + name)
             res_plot = ResolutionPlot("energy", "L1", "offline_" + name)
             twoD_plot = OnlineVsOffline("L1", "offline_" + name)
             self.register_plotter(eff_plot)
+            self.register_plotter(eff_vs_thresh)
             self.register_plotter(res_plot)
             self.register_plotter(twoD_plot)
             setattr(self, name + "_eff", eff_plot)
+            setattr(self, name + "_effVsThresh", eff_vs_thresh)
             setattr(self, name + "_res", res_plot)
             setattr(self, name + "_2D", twoD_plot)
 
@@ -184,12 +195,15 @@ class Analyzer(BaseAnalyzer):
 
         for name in self._jetTypes:
             eff_plot = EfficiencyPlot("L1", "offline_" + name)
+            eff_vs_thresh = EffVsThreshPlot("L1", "offline_" + name)
             res_plot = ResolutionPlot("energy", "L1", "offline_" + name)
             twoD_plot = OnlineVsOffline("L1", "offline_" + name)
             self.register_plotter(eff_plot)
+            self.register_plotter(eff_vs_thresh)
             self.register_plotter(res_plot)
             self.register_plotter(twoD_plot)
             setattr(self, name + "_eff", eff_plot)
+            setattr(self, name + "_effVsThresh", eff_vs_thresh)
             setattr(self, name + "_res", res_plot)
             setattr(self, name + "_2D", twoD_plot)
 
@@ -281,8 +295,10 @@ class Analyzer(BaseAnalyzer):
 
         if 'thresholds' in self.params:
             allThresholds = self.params['thresholds']
+            allOffThresholds = self.params['offline_thresholds']
         else:
             allThresholds = ALL_THRESHOLDS
+            allOffThresholds = ALL_OFF_THRESHOLDS
 
         for cfg in cfgs:
 
@@ -290,13 +306,16 @@ class Analyzer(BaseAnalyzer):
             twoD_plot = getattr(self, cfg.name + prefix + "_2D" + suffix)
 
             thresholds = []
+            offline_thresholds = []
             for l1trig, thresh in allThresholds.items():
                 if emulator and "Emu" not in l1trig or not emulator and "Emu" in l1trig:
                     continue
                 if l1trig.replace("_Emu", "") in cfg.name:
                     thresholds = thresh
+                    offline_thresholds = allOffThresholds.get(l1trig)
                     break
             if 'pfMET' in cfg.name:
+                offline_thresholds = allOffThresholds.get("METHF")
                 if emulator:
                     thresholds = allThresholds.get("METHF_Emu")
                 else:
@@ -341,6 +360,11 @@ class Analyzer(BaseAnalyzer):
 
             if high_range:
                 continue
+
+            eff_vs_thresh = getattr(self, cfg.name + prefix + "_effVsThresh" + suffix)
+            eff_vs_thresh.build(cfg.on_title, cfg.off_title, puBins,
+                                offline_thresholds, cfg.max, 0, cfg.max,
+                                legend_title=etaRange)
             res_plot = getattr(self, cfg.name + prefix + "_res" + suffix)
             res_plot.build(cfg.on_title, cfg.off_title,
                            puBins, 150, -3, 3, legend_title=etaRange)
@@ -377,10 +401,13 @@ class Analyzer(BaseAnalyzer):
             genNVtx = event.Generator_nVtx
 
         if not self._doGen:
+            pileup = recoNVtx
             if (event['run'], event['lumi']) in self._lumiMu:
                 pileup = self._lumiMu[(event['run'], event['lumi'])]
             if not self._passesLumiFilter(event.run, event.lumi):
                 return True
+        else:
+            pileup = genNVtx
 
         offline, online = extractSums(
             event, self._doEmu, self._doReco, self._doGen)
@@ -390,12 +417,9 @@ class Analyzer(BaseAnalyzer):
                 continue
             on = online[name]
             off = offline[name]
-            for suffix in ['_eff', '_res', '_2D', '_eff_HR', '_2D_HR']:
+            for suffix in ['_eff', "_effVsThresh", '_res', '_2D', '_eff_HR', '_2D_HR']:
                 if '_res' in suffix and (on.et < 0.01 or off.et < 30):
                     continue
-                pileup = recoNVtx
-                if 'gen' in name:
-                    pileup = genNVtx
                 getattr(self, name + suffix).fill(pileup, off.et, on.et)
             if hasattr(self, name + "_phi_res"):
                 getattr(self, name + "_phi_res").fill(pileup, off.phi, on.phi)
@@ -444,7 +468,7 @@ class Analyzer(BaseAnalyzer):
                         genL1EmuJetEt = 0.
 
                     for region in genFillRegions:
-                        for suffix in ['_eff', '_res', '_2D', '_eff_HR', '_2D_HR']:
+                        for suffix in ['_eff', '_effVsThresh', '_res', '_2D', '_eff_HR', '_2D_HR']:
                             if '_res' in suffix and (genL1EmuJetEt == 0 or leadingGenJet.etCorr < 30):
                                 continue
                             name = 'genJetET_{0}_Emu{1}'.format(region, suffix)
@@ -459,7 +483,7 @@ class Analyzer(BaseAnalyzer):
                     genL1JetEt = 0.
 
                 for region in genFillRegions:
-                    for suffix in ['_eff', '_res', '_2D', '_eff_HR', '_2D_HR']:
+                    for suffix in ['_eff', '_effVsThresh', '_res', '_2D', '_eff_HR', '_2D_HR']:
                         if '_res' in suffix and (genL1JetEt == 0 or leadingGenJet.etCorr < 30):
                             continue
                         name = 'genJetET_{0}{1}'.format(region, suffix)
@@ -489,7 +513,7 @@ class Analyzer(BaseAnalyzer):
                         pfL1EmuJetEt = 0.
 
                     for region in pfFillRegions:
-                        for suffix in ['_eff', '_res', '_2D', '_eff_HR', '_2D_HR']:
+                        for suffix in ['_eff', '_effVsThresh', '_res', '_2D', '_eff_HR', '_2D_HR']:
                             if '_res' in suffix and (pfL1EmuJetEt == 0 or leadingPFJet.etCorr < 30):
                                 continue
                             name = 'pfJetET_{0}_Emu{1}'.format(region, suffix)
@@ -504,7 +528,7 @@ class Analyzer(BaseAnalyzer):
                     pfL1JetEt = 0.
 
                 for region in pfFillRegions:
-                    for suffix in ['_eff', '_res', '_2D', '_eff_HR', '_2D_HR']:
+                    for suffix in ['_eff', '_effVsThresh', '_res', '_2D', '_eff_HR', '_2D_HR']:
                         if '_res' in suffix and (pfL1JetEt == 0 or leadingPFJet.etCorr < 30):
                             continue
                         name = 'pfJetET_{0}{1}'.format(region, suffix)
@@ -528,7 +552,7 @@ class Analyzer(BaseAnalyzer):
                         caloL1EmuJetEt = 0.
 
                     for region in caloFillRegions:
-                        for suffix in ['_eff', '_res', '_2D', '_eff_HR', '_2D_HR']:
+                        for suffix in ['_eff', '_effVsThresh', '_res', '_2D', '_eff_HR', '_2D_HR']:
                             if '_res' in suffix and (caloL1EmuJetEt == 0 or leadingCaloJet.etCorr < 30):
                                 continue
                             name = 'caloJetET_{0}_Emu{1}'.format(
@@ -544,7 +568,7 @@ class Analyzer(BaseAnalyzer):
                     caloL1JetEt = 0.
 
                 for region in caloFillRegions:
-                    for suffix in ['_eff', '_res', '_2D', '_eff_HR', '_2D_HR']:
+                    for suffix in ['_eff', '_effVsThresh', '_res', '_2D', '_eff_HR', '_2D_HR']:
                         if '_res' in suffix and (caloL1JetEt == 0 or leadingCaloJet.etCorr < 30):
                             continue
                         name = 'caloJetET_{0}{1}'.format(region, suffix)
@@ -585,6 +609,7 @@ class Analyzer(BaseAnalyzer):
         for plot_name in plot_names:
             getattr(self, plot_name + '_eff').draw()
             getattr(self, plot_name + '_eff_HR').draw()
+            # getattr(self, plot_name + '_effVsThresh').draw()
             getattr(self, plot_name + '_res').draw()
 
         if self._doEmu:
@@ -592,6 +617,8 @@ class Analyzer(BaseAnalyzer):
             for plot_name in plot_names:
                 getattr(self, plot_name + '_eff').overlay([
                     getattr(self, plot_name + '_Emu_eff')])
+                # getattr(self, plot_name + '_effVsThresh').overlay([
+                #    getattr(self, plot_name + '_Emu__effVsThresh')])
                 getattr(self, plot_name + '_res').overlay([
                     getattr(self, plot_name + '_Emu_res')])
 
@@ -601,6 +628,9 @@ class Analyzer(BaseAnalyzer):
                 getattr(self, plot_name + '_eff').overlay(
                     [getattr(other_analyzer, plot_name + '_eff')
                         for other_analyzer in other_analyzers])
+                # getattr(self, plot_name + '_effVsThresh').overlay(
+                #    [getattr(other_analyzer, plot_name + '_effVsThresh')
+                #        for other_analyzer in other_analyzers])
                 getattr(self, plot_name + '_res').overlay(
                     [getattr(other_analyzer, plot_name + '_res')
                         for other_analyzer in other_analyzers])

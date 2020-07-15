@@ -28,6 +28,12 @@ analysis:
     METHF:        [103]
     JetET_BE:     [121]
     JetET_HF:     [110]
+  offline_thresholds:
+    HT:           [450]
+    METBE:        [200]
+    METHF:        [200]
+    JetET_BE:     [180]
+    JetET_HF:     [180]
 
   analyzers:
      jetMet_analyzer:
