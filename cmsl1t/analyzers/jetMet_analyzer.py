@@ -605,4 +605,14 @@ class Analyzer(BaseAnalyzer):
                     [getattr(other_analyzer, plot_name + '_res')
                         for other_analyzer in other_analyzers])
 
+            if self._doEmu:
+
+                for plot_name in plot_names:
+                    getattr(self, plot_name + '_Emu_eff').overlay(
+                        [getattr(other_analyzer, plot_name + '_Emu_eff')
+                            for other_analyzer in other_analyzers])
+                    getattr(self, plot_name + '_Emu_res').overlay(
+                        [getattr(other_analyzer, plot_name + '_Emu_res')
+                            for other_analyzer in other_analyzers])
+
         return True
