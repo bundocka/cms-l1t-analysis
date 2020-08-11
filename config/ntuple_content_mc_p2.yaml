@@ -391,6 +391,113 @@ content:
       L1PhaseIPFJet.genMet:
         aliases:
         - event.L1PhaseIPFJet_genMet
+  l1TrackMETTree/L1TrkMETTree:
+    name: L1TrkMET
+    optional: true
+    branches:
+      L1TrkMET.GenMet:
+        aliases:
+        -  event.L1TrkMET_GenMet
+      L1TrkMET.GenMetPhi:
+        aliases:
+        -  event.L1TrkMET_GenMetPhi
+      L1TrkMET.GenSumEt:
+        aliases:
+        -  event.L1TrkMET_GenSumEt
+      L1TrkMET.TrkSumEt:
+        aliases:
+        -  event.L1TrkMET_TrkSumEt
+      L1TrkMET.TrkMet:
+        aliases:
+        -  event.L1TrkMET_TrkMet
+      L1TrkMET.TrkMetPhi:
+        aliases:
+        -  event.L1TrkMET_TrkMetPhi
+      L1TrkMET.CutTrkMet:
+        aliases:
+        -  event.L1TrkMET_CutTrkMet
+      L1TrkMET.CutTrkMetPhi:
+        aliases:
+        -  event.L1TrkMET_CutTrkMetPhi
+      L1TrkMET.CutTrkSumEt:
+        aliases:
+        -  event.L1TrkMET_CutTrkSumEt
+      L1TrkMET.MVATrkMet:
+        aliases:
+        -  event.L1TrkMET_MVATrkMet
+        L1TrkMET.MVATrkMetPhi:
+        aliases:
+        -  event.L1TrkMET_MVATrkMetPhi
+      L1TrkMET.MVATrkSumEt:
+        aliases:
+        -  event.L1TrkMET_MVATrkSumEt
+  l1TrackJetTree/L1TrackJetTree:
+    name: L1TrackJet
+    optional: true
+    branches:
+      L1TrackJet.nTrkJets:
+        aliases:
+        -  event.L1TrackJet_nTrkJets
+      L1TrackJet.TrkJetEt:
+        aliases:
+        - event.L1TrackJet_TrkJetEt
+      L1TrackJet.TrkJetEta:
+        aliases:
+        - event.L1TrackJet_TrkJetEta
+      L1TrackJet.TrkJetPhi:
+        aliases:
+        - event.L1TrackJet_TrkJetPhi
+      L1TrackJet.TrkJetHt:
+        aliases:
+        - event.L1TrackJet_TrkJetHt
+      L1TrackJet.nCutTrkJets:
+        aliases:
+        - event.L1TrackJet_nCutTrkJets
+      L1TrackJet.CutTrkJetEt:
+        aliases:
+        - event.L1TrackJet_CutTrkJetEt
+      L1TrackJet.CutTrkJetEta:
+        aliases:
+        - event.L1TrackJet_CutTrkJetEta
+      L1TrackJet.CutTrkJetPhi:
+        aliases:
+        - event.L1TrackJet_CutTrkJetPhi
+      L1TrackJet.CutTrkJetHt:
+        aliases:
+        - event.L1TrackJet_CutTrkJetHt
+      L1TrackJet.nMVATrkJets:
+        aliases:
+        - event.L1TrackJet_nMVATrkJets
+      L1TrackJet.MVATrkJetEt:
+        aliases:
+        - event.L1TrackJet_MVATrkJetEt
+      L1TrackJet.MVATrkJetEta:
+        aliases:
+        - event.L1TrackJet_MVATrkJetEta
+      L1TrackJet.MVATrkJetPhi:
+        aliases:
+        - event.L1TrackJet_MVATrkJetPhi
+      L1TrackJet.MVATrkJetHt:
+        aliases:
+        - event.L1TrackJet_MVATrkJetHt
+      L1TrackJet.nGenJet:
+        aliases:
+        - event.L1TrackJet_nGenJet
+      L1TrackJet.GenJetPt:
+        aliases:
+        - event.L1TrackJet_GenJetPt
+      L1TrackJet.GenJetEta:
+        aliases:
+        - event.L1TrackJet_GenJetEta
+      L1TrackJet.GenJetPhi:
+        aliases:
+        - event.L1TrackJet_GenJetPhi
+      L1TrackJet.GenJetM:
+        aliases:
+        - event.L1TrackJet_GenJetM
+      L1TrackJet.GenJetHt:
+        aliases:
+        - event.L1TrackJet_GenJetHt
   l1UpgradeEmuTree/L1UpgradeTree:
     name: L1UpgradeTree
     optional: false
