@@ -54,14 +54,14 @@ analysis:
       outputs:
         - goodGenJets
     genSums:
-      module: cmsl1t.producers.gensums_custTree
+      module: cmsl1t.producers.gensums_pfjet
       inputs:
         - L1PhaseIPFJet_genJetHt
         - L1PhaseIPFJet_genMet
       outputs:
         - genSums
     l1Sums:
-      module: cmsl1t.producers.l1p2sums_custTree
+      module: cmsl1t.producers.l1p2sums_pfjet
       inputs:
         - L1PhaseIPFJet_phaseIPFJetHt
         - L1PhaseIPFJet_pfMet
